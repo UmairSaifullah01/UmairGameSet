@@ -7,21 +7,21 @@ namespace UMGS
 {
     public abstract class CurrencyBinding : MonoBehaviour
     {
-        [SerializeField] protected string currencyName;
+        [SerializeField] protected Currency currencyName;
         private void OnDisable()
         {
-            if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnValueChangeUnregister(currencyName, ChangeEffect);
-            
+            if (VCHandler.Instance != null)
+                VCHandler.Instance.OnValueChangeUnregister (currencyName, ChangeEffect);
+
         }
 
         protected abstract void ChangeEffect(object sender,PropertyChangedEventArgs args);
         
         private void OnEnable()
         {
-            if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnValueChangeRegister(currencyName, ChangeEffect);
-            
+            if (VCHandler.Instance != null)
+                VCHandler.Instance.OnValueChangeUnregister (currencyName, ChangeEffect);
+
         }
         
     }

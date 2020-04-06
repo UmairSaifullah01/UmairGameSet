@@ -5,22 +5,22 @@ namespace UMDataManagement
     public static class DataHandler
     {
         private static bool isInitialized;
-        private static IDataSaver dataSaver;
+        private static IDataSaver sdataSaver;
         /// <summary>
         /// initialize data system
         /// </summary>
         public static void Initialize ()
         {
-            dataSaver = new XmlDataSaver ();
+            sdataSaver = new XmlDataSaver ();
             isInitialized = true;
         }
         /// <summary>
         /// initialize data system with desired IDataSaver type data saver
         /// </summary>
-        /// <param name="dataSaverInstance"></param>
-        public static void Initialize (IDataSaver dataSaverInstance)
+        /// <param name="dataSaver"></param>
+        public static void Initialize (IDataSaver dataSaver)
         {
-            dataSaver = dataSaverInstance;
+            sdataSaver = dataSaver;
             isInitialized = true;
         }
         /// <summary>
@@ -32,7 +32,9 @@ namespace UMDataManagement
         /// <returns>Return true if it finds data</returns>
         public static bool CanGet<T> (string key, out T dataObject)
         {
-            return dataSaver.CanGet (key, out dataObject);
+            if (!isInitialized)
+                Initialize ();
+            return sdataSaver.CanGet (key, out dataObject);
         }
         /// <summary>
         /// Contains used to check is data exist with name of key
@@ -41,7 +43,9 @@ namespace UMDataManagement
         /// <returns></returns>
         public static bool Contains (string key)
         {
-            return dataSaver.Contains (key);
+            if (!isInitialized)
+                Initialize ();
+            return sdataSaver.Contains (key);
         }
         /// <summary>
         /// Delete saved data by key(data saved name)
@@ -49,7 +53,9 @@ namespace UMDataManagement
         /// <param name="key"></param>
         public static void Delete (string key)
         {
-            dataSaver.Delete (key);
+            if (!isInitialized)
+                Initialize ();
+            sdataSaver.Delete (key);
         }
         /// <summary>
         /// Used to get data by key
@@ -59,7 +65,9 @@ namespace UMDataManagement
         /// <returns></returns>
         public static T Get<T> (string key)
         {
-            return dataSaver.Get<T> (key);
+            if (!isInitialized)
+                Initialize ();
+            return sdataSaver.Get<T> (key);
         }
         /// <summary>
         /// Used to saved data by key 
@@ -69,7 +77,9 @@ namespace UMDataManagement
         /// <typeparam name="T"></typeparam>
         public static void Save<T> (string key, T dataObject)
         {
-            dataSaver.Save (key, dataObject);
+            if (!isInitialized)
+                Initialize ();
+            sdataSaver.Save (key, dataObject);
         }
     }
 
