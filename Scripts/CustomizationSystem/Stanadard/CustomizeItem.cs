@@ -10,21 +10,27 @@ public class CustomizeItem : IPurchasable
 
 	public                   string                 ID;
 	[SerializeField] private string                 virtualCurrencyID;
-	[SerializeField] private int                    price;
+	[SerializeField] private float                    price;
 	[SerializeField] private bool                   isPurchased;
 	public                   CustomizationInfluence influence;
 
-	public int Price
+	public float Price
 	{
 		get => price;
 		set => price = value;
 	}
 
 
+	public Currency CurrencyName { get; }
 	public bool IsPurchased
 	{
 		get => isPurchased;
 		set => isPurchased = value;
+	}
+
+	public void Purchased()
+	{
+		DataPersistSystem.Instance.Add(ID, new Data<int>(1));
 	}
 
 	public string VirtualCurrencyID
@@ -32,30 +38,7 @@ public class CustomizeItem : IPurchasable
 		get => virtualCurrencyID;
 		set => virtualCurrencyID = value;
 	}
-
-
-	public bool Purchase(Action OnPurchaseSuccess, Action OnPurchaseFailed, bool isFree = false)
-	{
-		if (isPurchased)
-		{
-			Debug.Log("Product Already Purchased");
-			return true;
-		}
-
-		if (CurrencyManager.Instance.GetValue(VirtualCurrencyID) >= Price)
-		{
-			isPurchased = true;
-			CurrencyManager.Instance.AddValue(virtualCurrencyID, -Price);
-			DataPersistSystem.Instance.Add(ID, new Data<int>(1));
-			OnPurchaseSuccess.Invoke();
-			return true;
-		}
-		else
-		{
-			OnPurchaseFailed.Invoke();
-			return false;
-		}
-	}
+	
 
 	private void GetData()
 	{

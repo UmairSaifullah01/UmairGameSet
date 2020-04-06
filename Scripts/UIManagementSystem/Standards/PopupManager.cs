@@ -94,9 +94,9 @@ public class PopupManager : UIHandler
 		Show("Note", message, "OK", null, false, null, null, true);
 	}
 
-	public bool IsCurrencyValid(string name, int value)
+	public bool IsCurrencyValid(Currency name, int value)
 	{
-		if (CurrencyManager.Instance && CurrencyManager.Instance.GetValue(name) >= value) return true;
+		if (VCHandler.Instance != null && VCHandler.Instance.GetValue(name) >= value) return true;
 		ActivatePanel("NotEnoughCash");
 		return false;
 	}
