@@ -298,14 +298,12 @@ public static class UMTools
 
 	public static TransformObj GetTransformValues(this Transform trans)
 	{
-		TransformObj obj = new TransformObj {position = trans.position, rotation = trans.eulerAngles};
-		return obj;
+		return new TransformObj {position = trans.position, rotation = trans.eulerAngles};
 	}
 
 	public static TransformObj GetTransformValues(this Transform trans, bool isLocal = false)
 	{
-		TransformObj obj = new TransformObj {position = (isLocal) ? trans.localPosition : trans.position, rotation = (isLocal) ? trans.localEulerAngles : trans.eulerAngles};
-		return obj;
+		return new TransformObj {position = (isLocal) ? trans.localPosition : trans.position, rotation = (isLocal) ? trans.localEulerAngles : trans.eulerAngles};;
 	}
 
 	public static void SetTransformValues(this Transform trans, TransformObj values, bool isLocal = false)

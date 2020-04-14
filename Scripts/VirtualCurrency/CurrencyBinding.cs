@@ -8,7 +8,7 @@ namespace UMGS
     public abstract class CurrencyBinding : MonoBehaviour
     {
         [SerializeField] protected Currency currencyName;
-        private void OnDisable()
+        private void OnDestroy()
         {
             if (VCHandler.Instance != null)
                 VCHandler.Instance.OnValueChangeUnregister (currencyName, ChangeEffect);
@@ -17,10 +17,10 @@ namespace UMGS
 
         protected abstract void ChangeEffect(object sender,PropertyChangedEventArgs args);
         
-        private void OnEnable()
+        private void Start()
         {
             if (VCHandler.Instance != null)
-                VCHandler.Instance.OnValueChangeUnregister (currencyName, ChangeEffect);
+                VCHandler.Instance.OnValueChangeRegister (currencyName, ChangeEffect);
 
         }
         
