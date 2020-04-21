@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UMGS;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PanelBehaviour : MonoBehaviour, IPanel
