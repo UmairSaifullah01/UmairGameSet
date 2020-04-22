@@ -73,14 +73,14 @@ namespace UMGS.Vehicle
 //
 		//			return isGrounded;
 		//		} 
-
+		public float lastCollisionTime { get; private set; }
 
 		//}
 		//private 
 
 		bool isGrounded      = false;
 		int  lastGroundCheck = 0;
-
+		bool isColliding     = false;
 
 		void Start()
 		{
@@ -103,6 +103,7 @@ namespace UMGS.Vehicle
 				em.rateOverTime = ControlInput.handbrake > 0.5f ? 0 : Mathf.Lerp(em.rateOverTime.constant, Mathf.Clamp(150.0f * ControlInput.throttle, 30.0f, 100.0f), 0.1f);
 			}
 
+			if (isColliding) lastCollisionTime += Time.deltaTime;
 			sounds.DoUpdate(speed);
 		}
 
@@ -214,16 +215,19 @@ namespace UMGS.Vehicle
 
 		public void OnSkid(Vector3 skidPoint, float intensity)
 		{
-			sounds.SkidAudio(skidPoint,intensity);
+			sounds.SkidAudio(skidPoint, intensity);
 		}
 
 		void OnCollisionEnter(Collision other)
 		{
+			isColliding       = true;
+			lastCollisionTime = 0;
 			sounds.ImpactAudio(other.contacts[0].point);
 		}
 
 		void OnCollisionExit(Collision other)
 		{
+			isColliding = false;
 		}
 
 	}

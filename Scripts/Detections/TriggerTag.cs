@@ -1,22 +1,26 @@
-﻿using System;
-using UMGS;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class TriggerTag : UJTrigger
+
+namespace UMGS
 {
-
-	public string     TargetTag;
-	public UnityEvent OnTriggerEnter;
-
-	void Start()
+	public class TriggerTag : UJTrigger
 	{
-		enter += Enter;
+
+		public string     TargetTag;
+		public UnityEvent OnTriggerEnter;
+
+		void Start()
+		{
+			enter += Enter;
+		}
+
+		void Enter(Collider col)
+		{
+			if (col.attachedRigidbody.CompareTag(TargetTag)) OnTriggerEnter?.Invoke();
+		}
+
 	}
 
-	void Enter(Collider col)
-	{
-		if (col.attachedRigidbody.CompareTag(TargetTag)) OnTriggerEnter?.Invoke();
-	}
 
 }

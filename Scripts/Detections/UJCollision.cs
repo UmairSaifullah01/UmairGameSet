@@ -25,35 +25,49 @@ namespace UMGS
 
     public static class UMCollision
     {
+        static UJCollision GetCollision(GameObject gameObject)
+        {
+            UJCollision trgr = gameObject.GetComponent<UJCollision>();
+            if (trgr == null)
+            {
+                trgr = gameObject.AddComponent<UJCollision>();
+            }
+
+            trgr.hideFlags = HideFlags.HideInInspector;
+            return trgr;
+        }
         public static void OnCollisionEnter (this Collider col, Action<Collision> trigger)
         {
-            UJCollision trgr = col.GetComponent<UJCollision> ();
-            if (trgr == null)
-            {
-                trgr = col.gameObject.AddComponent<UJCollision> ();
-            }
-            trgr.hideFlags = HideFlags.HideInInspector;
+            UJCollision trgr = GetCollision(col.gameObject);
             trgr.enter = trigger;
         }
+        
         public static void OnCollisionStay (this Collider col, Action<Collision> trigger)
         {
-            UJCollision trgr = col.GetComponent<UJCollision> ();
-            if (trgr == null)
-            {
-                trgr = col.gameObject.AddComponent<UJCollision> ();
-            }
-            trgr.hideFlags = HideFlags.HideInInspector;
+            UJCollision trgr = GetCollision(col.gameObject);
             trgr.stay = trigger;
         }
 
         public static void OnCollisionExit (this Collider col, Action<Collision> trigger)
         {
-            UJCollision trgr = col.GetComponent<UJCollision> ();
-            if (trgr == null)
-            {
-                trgr = col.gameObject.AddComponent<UJCollision> ();
-            }
-            trgr.hideFlags = HideFlags.HideInInspector;
+            UJCollision trgr = GetCollision(col.gameObject);
+            trgr.exit = trigger;
+        }
+         public static void OnCollisionEnter (this Rigidbody rigidbody, Action<Collision> trigger)
+        {
+            UJCollision trgr = GetCollision(rigidbody.gameObject);
+            trgr.enter = trigger;
+        }
+        
+        public static void OnCollisionStay (this Rigidbody rigidbody, Action<Collision> trigger)
+        {
+            UJCollision trgr = GetCollision(rigidbody.gameObject);
+            trgr.stay = trigger;
+        }
+
+        public static void OnCollisionExit (this Rigidbody rigidbody, Action<Collision> trigger)
+        {
+            UJCollision trgr = GetCollision(rigidbody.gameObject);
             trgr.exit = trigger;
         }
     }

@@ -8,6 +8,7 @@ public class MiniMap : MonoBehaviour
 {
 
 	public static            MiniMap        instance;
+	public                   Transform      player;
 	public                   Camera         cam;
 	public                   RectTransform  container;
 	public                   RectTransform  ItemUIPrefab;
@@ -20,7 +21,7 @@ public class MiniMap : MonoBehaviour
 	void Awake()
 	{
 		instance = this;
-	//	follower = new TargetFollower(cam.transform, GameController.Instance.controller.transform);
+		follower = new TargetFollower(cam.transform, player);
 		radius   = (container.sizeDelta.x / 2) - BorderOffScreen;
 	}
 
@@ -37,7 +38,7 @@ public class MiniMap : MonoBehaviour
 	private void Remove(IMiniMapItem item)
 	{
 		var index = items.FindIndex(x => x.item == item);
-		if (items[index].relativeUIItem.gameObject)
+		if (items[index].relativeUIItem &&items[index].relativeUIItem.gameObject)
 			Destroy(items[index].relativeUIItem.gameObject);
 		items.RemoveAt(index);
 	}

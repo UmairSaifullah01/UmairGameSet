@@ -20,8 +20,8 @@ public class WheelSkid : MonoBehaviour
 	WheelHit      wheelHitInfo;
 
 	const float   SKID_FX_SPEED         = 0.5f;  // Min side slip speed in m/s to start showing a skid
-	const float   MAX_SKID_INTENSITY    = 20.0f; // m/s where skid opacity is at full intensity
-	const float   WHEEL_SLIP_MULTIPLIER = 10.0f; // For wheelspin. Adjust how much skids show
+	const float   MAX_SKID_INTENSITY    = 10.0f; // m/s where skid opacity is at full intensity
+	const float   WHEEL_SLIP_MULTIPLIER = 2.0f; // For wheelspin. Adjust how much skids show
 	int           lastSkid              = -1;    // Array index for the skidmarks controller. Index of last skidmark piece this wheel used
 	float         lastFixedUpdateTime;
 	VehicleEngine engine;
@@ -57,8 +57,8 @@ public class WheelSkid : MonoBehaviour
 			// NOTE: This extra line should not be needed and you can take it out if you have decent wheel physics
 			// The built-in Unity demo car is actually skidding its wheels the ENTIRE time you're accelerating,
 			// so this fades out the wheelspin-based skid as speed increases to make it look almost OK
-			wheelSpin =  Mathf.Max(0, wheelSpin * (10 - Mathf.Abs(carForwardVel)));
-			skidTotal += wheelSpin;
+			// wheelSpin =  Mathf.Max(0, wheelSpin * (10 - Mathf.Abs(carForwardVel)));
+			// skidTotal += wheelSpin;
 
 			// Skid if we should
 			if (skidTotal >= SKID_FX_SPEED)

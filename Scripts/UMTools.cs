@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using UMGS;
 using UnityEngine;
@@ -64,6 +65,7 @@ public static class UMTools
 	{
 		trans.position = trans2.position;
 	}
+
 	public static void OptimizeRenderResolution()
 	{
 		var resolution = Screen.currentResolution;
@@ -75,11 +77,12 @@ public static class UMTools
 			Screen.SetResolution(width, height, true);
 		}
 	}
+
 	public static void ConvertTextToAudio(string text, AudioSource source)
 	{
 		CoroutineHandler.StartStaticCoroutine(TextToAudio(text, source));
 	}
-	
+
 	private static IEnumerator TextToAudio(string text, AudioSource source)
 	{
 		var url = $"https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q={UnityWebRequest.EscapeURL(text)}&tl=En-gb";
@@ -157,9 +160,19 @@ public static class UMTools
 		return AllPoint;
 	}
 
+	public static float Distance(this Transform trans, Transform target)
+	{
+		return Distance(trans.position, target.position);
+	}
+
 	public static float Distance(this Transform trans, Vector3 targetPosition)
 	{
-		return Vector3.Distance(trans.position, targetPosition);
+		return Distance(trans.position, targetPosition);
+	}
+
+	public static float Distance(this Vector3 pos, Vector3 targetPosition)
+	{
+		return Vector3.Distance(pos, targetPosition);
 	}
 
 	/// <summary>
@@ -174,6 +187,17 @@ public static class UMTools
 	public static float ConvertToValue(float MaxCapacity, float MaxUnit, float AmountinUnits)
 	{
 		return (AmountinUnits / MaxUnit) * MaxCapacity;
+	}
+
+	public static Collider[] AttachedCollider(this Rigidbody rigidbody)
+	{
+		var col         = rigidbody.GetComponent<Collider>();
+		var subCollider = rigidbody.GetComponentsInChildren<Collider>();
+		if (col && subCollider.Length > 0)
+		{
+			subCollider.Append(col);
+		}
+		return subCollider;
 	}
 
 	public static int RandomWithExclusiveValue(int min, int max, int value)
@@ -286,11 +310,14 @@ public static class UMTools
 	{
 		return System.Convert.ToInt32(obj);
 	}
-	public static Vector3 GetRandomPoint(Vector3 center, float maxDistance) {
+
+	public static Vector3 GetRandomPoint(Vector3 center, float maxDistance)
+	{
 		// Get Random Point inside Sphere which position is center, radius is maxDistance
 		Vector3 randomPos = Random.insideUnitSphere * maxDistance + center;
-		return GetPointOnNavMesh(randomPos,maxDistance);
+		return GetPointOnNavMesh(randomPos, maxDistance);
 	}
+
 	public static Vector3 GetPointOnNavMesh(Vector3 from, float distance = 100)
 	{
 		return NavMesh.SamplePosition(from, out NavMeshHit myNavHit, distance, NavMesh.AllAreas) ? myNavHit.position : GetPointOnNavMesh(from, distance + 100);
@@ -303,7 +330,8 @@ public static class UMTools
 
 	public static TransformObj GetTransformValues(this Transform trans, bool isLocal = false)
 	{
-		return new TransformObj {position = (isLocal) ? trans.localPosition : trans.position, rotation = (isLocal) ? trans.localEulerAngles : trans.eulerAngles};;
+		return new TransformObj {position = (isLocal) ? trans.localPosition : trans.position, rotation = (isLocal) ? trans.localEulerAngles : trans.eulerAngles};
+		;
 	}
 
 	public static void SetTransformValues(this Transform trans, TransformObj values, bool isLocal = false)
