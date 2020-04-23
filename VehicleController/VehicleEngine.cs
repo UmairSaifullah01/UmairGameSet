@@ -133,7 +133,7 @@ namespace UMGS.Vehicle
 			}
 
 			//max Speed Counter
-			attachedRigidbody.velocity = attachedRigidbody.velocity.normalized * Mathf.Clamp(attachedRigidbody.velocity.magnitude, 0, maxSpeed);
+			attachedRigidbody.velocity = attachedRigidbody.velocity.normalized * Mathf.Clamp(attachedRigidbody.velocity.magnitude, 0, maxSpeed * (1 - ControlInput.brake));
 			ApplyAntiRoll();
 			//Grounded Checking....
 			if (!IsGrounded)
