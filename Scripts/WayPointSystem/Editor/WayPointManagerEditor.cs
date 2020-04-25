@@ -7,7 +7,7 @@ namespace UMGS.WayPointSystem
 
 
 	[CustomEditor(typeof(WayPointManager))]
-	public class WayPointManagerWindow : Editor
+	public class WayPointManagerEditor : Editor
 	{
 
 		WayPointManager  _wayPointManager;
@@ -38,13 +38,13 @@ namespace UMGS.WayPointSystem
 		{
 			if (GUILayout.Button("Create WayPoint"))
 			{
-				CreatWayPoint();
+				CreateWayPoint();
 			}
 
 			if (GUILayout.Button("Create WayPoint Before"))
-				CreatWayPointBefore();
+				CreateWayPointBefore();
 			if (GUILayout.Button("Create WayPoint After"))
-				CreatWayPointAfter();
+				CreateWayPointAfter();
 			if (GUILayout.Button("Remove WayPoint"))
 				RemoveWayPoint();
 			if (GUILayout.Button("Place To Ground"))
@@ -89,7 +89,7 @@ namespace UMGS.WayPointSystem
 			}
 		}
 
-		void CreatWayPointAfter()
+		void CreateWayPointAfter()
 		{
 			GameObject wayPointObject = new GameObject($"WayPoint {wayPointRoot.childCount}", typeof(WayPoint));
 			wayPointObject.transform.SetParent(wayPointRoot, false);
@@ -110,7 +110,7 @@ namespace UMGS.WayPointSystem
 			Selection.activeGameObject = wayPointObject;
 		}
 
-		void CreatWayPointBefore()
+		void CreateWayPointBefore()
 		{
 			GameObject wayPointObject = new GameObject($"WayPoint {wayPointRoot.childCount}", typeof(WayPoint));
 			wayPointObject.transform.SetParent(wayPointRoot, false);
@@ -131,7 +131,7 @@ namespace UMGS.WayPointSystem
 			Selection.activeGameObject = wayPointObject;
 		}
 
-		public void CreatWayPoint()
+		public void CreateWayPoint()
 		{
 			GameObject wayPointObject = new GameObject($"WayPoint {wayPointRoot.childCount}", typeof(WayPoint));
 			wayPointObject.transform.SetParent(wayPointRoot, false);

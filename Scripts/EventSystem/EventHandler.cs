@@ -1,10 +1,4 @@
-﻿//----------------------------------------------
-//          Events: EventHandler
-//          Copyright © 2018 Habib Afzal
-//----------------------------------------------
-
-using UMDataManagement;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 namespace UMGS
@@ -40,6 +34,11 @@ namespace UMGS
 		public static EventListener            RewaredVideoRewardEvent = new EventListener();
 //Sounds
 		public static EventListener ButtonSound = new EventListener();
+
+
+		//Race Game Events
+
+		
 
 	}
 

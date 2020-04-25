@@ -10,13 +10,18 @@ namespace UMGS.WayPointSystem
 	public class WayPoint : MonoBehaviour
 	{
 
-		public                 WayPoint previousWayPoint;
-		public                 WayPoint nextWayPoint;
-		[Range(0.1f, 15f)] public float width = 1;
+		public                    WayPoint previousWayPoint;
+		public                    WayPoint nextWayPoint;
+		[Range(0.1f, 15f)] public float    width = 1;
+
+		public Vector3 GetPositionRandom()
+		{
+			return GetPosition(Random.Range(0f, 1f));
+		}
 
 		public Vector3 GetPosition()
 		{
-			return GetPosition(Random.Range(0f, 1f));
+			return transform.position;
 		}
 
 		public Vector3 GetPosition(float deltaOffSet)

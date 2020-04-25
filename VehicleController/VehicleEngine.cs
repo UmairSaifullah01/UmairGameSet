@@ -1,7 +1,6 @@
 ﻿using System;
 using EVP;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace UMGS.Vehicle
@@ -78,9 +77,11 @@ namespace UMGS.Vehicle
 		//}
 		//private 
 
-		bool isGrounded      = false;
-		int  lastGroundCheck = 0;
-		bool isColliding     = false;
+		bool    isGrounded      = false;
+		int     lastGroundCheck = 0;
+		bool    isColliding     = false;
+		float[] travelValues    = new float[4];
+		float   desireSpeed;
 
 		void Start()
 		{
@@ -132,30 +133,39 @@ namespace UMGS.Vehicle
 				EasySuspension(wheel.WheelCollider);
 			}
 
+			if (ControlInput.brake > 0.5f)
+			{
+				desireSpeed = Mathf.MoveTowards(desireSpeed, speed > maxSpeed / 2 ? maxSpeed / 2 : 0, Time.deltaTime * speed);
+			}
+			else
+			{
+				desireSpeed = maxSpeed;
+			}
+
 			//max Speed Counter
-			attachedRigidbody.velocity = attachedRigidbody.velocity.normalized * Mathf.Clamp(attachedRigidbody.velocity.magnitude, 0, maxSpeed * (1 - ControlInput.brake));
+			attachedRigidbody.velocity = attachedRigidbody.velocity.normalized * Mathf.Clamp(attachedRigidbody.velocity.magnitude, 0, desireSpeed);
 			ApplyAntiRoll();
 			//Grounded Checking....
 			if (!IsGrounded)
 			{
+				//Direction changer force and rotation
 				attachedRigidbody.AddForce(Vector3.Cross(UMTools.SetVector3Axis(attachedRigidbody.velocity, 0, Axis.y), Vector3.up) * (-ControlInput.turn * 500));
+				transform.Rotate(0, 0, Time.deltaTime * 0.1f                                                                        * -ControlInput.turn);
 				//Simple Gravity
-				attachedRigidbody.AddForce(Vector3.down      * (9.8f * attachedRigidbody.mass));
-				transform.Rotate(0, 0, Time.deltaTime * 0.1f * -ControlInput.turn);
+				attachedRigidbody.AddForce(Physics.gravity * attachedRigidbody.mass);
 				attachedRigidbody.angularVelocity = Vector3.zero;
+				//Downforce
+				attachedRigidbody.AddForce(-transform.up * (speed * downforce * 10));
 			}
 			else
 			{
-				//Downforce
-				attachedRigidbody.AddForce(-transform.up * (speed * downforce * 10));
 				//Simple Gravity
-				if (speed < 0.2f) attachedRigidbody.AddForce(Vector3.down * (9.8f * attachedRigidbody.mass));
+				if (speed < 5f && transform.eulerAngles.z > 90) attachedRigidbody.AddForce(Physics.gravity * attachedRigidbody.mass);
 				else //Stick Gravity
-					attachedRigidbody.AddForce(-transform.up * (9.8f * attachedRigidbody.mass));
+					attachedRigidbody.AddForce(-transform.up * (Physics.gravity.magnitude * attachedRigidbody.mass));
 			}
 		}
 
-		float[] travelValues = new float[4];
 
 		void ApplyAntiRoll()
 		{
@@ -240,76 +250,6 @@ namespace UMGS.Vehicle
 		public Transform     VisualWheel;
 		public Vector3       LocalRotOffset;
 		public bool          Drive, Steer;
-
-	}
-
-	[System.Serializable]
-	public class VehicleAudio
-	{
-
-		[Header("Pitch Parameter")] public float       flatoutSpeed = 20.0f;
-		[Range(0.0f, 3.0f)]         public float       minPitch     = 0.7f;
-		[Range(0.0f, 0.1f)]         public float       pitchSpeed   = 0.05f;
-		[Header("Clips")]           public AudioClip   rolling;
-		public                             AudioClip   starting, impact, skid;
-		[Header("Clips")] public           AudioSource engineSource;
-		public                             AudioSource othersSource;
-		ControlInput                                   _input;
-		bool                                           startUp = false;
-
-		public void Initialize(ControlInput input)
-		{
-			_input = input;
-		}
-
-		public void DoUpdate(float speed)
-		{
-			if (_input.run && !startUp)
-			{
-				engineSource.clip = starting;
-				engineSource.Play();
-				engineSource.pitch = 1;
-				startUp            = true;
-			}
-
-			if (startUp && !engineSource.isPlaying)
-			{
-				engineSource.clip = rolling;
-				engineSource.loop = true;
-				engineSource.Play();
-			}
-
-			if (engineSource.clip == rolling)
-			{
-				engineSource.pitch = Mathf.Clamp(Mathf.Lerp(engineSource.pitch, minPitch + Mathf.Abs(speed) / flatoutSpeed, pitchSpeed), minPitch, 2);
-			}
-		}
-
-		public void ImpactAudio(Vector3 atPoint)
-		{
-			PlayOneTime(impact, atPoint, 0.5f, 1);
-		}
-
-		public void SkidAudio(Vector3 atPoint, float volume)
-		{
-			PlayOneTime(skid, atPoint, volume * 0.5f, 1);
-		}
-
-		void PlayOneTime(AudioClip clip, Vector3 position, float volume, float pitch)
-		{
-			if (pitch < 0.01f || volume < 0.01f) return;
-			AudioSource source = Object.Instantiate(othersSource, position, Quaternion.identity, othersSource.transform.parent);
-			if (source.isActiveAndEnabled)
-			{
-				source.clip         = clip;
-				source.volume       = volume;
-				source.pitch        = pitch;
-				source.dopplerLevel = 0.0f; // Doppler causes artifacts as for positioning the audio source
-				source.Play();
-			}
-
-			Object.Destroy(source.gameObject, clip.length / pitch);
-		}
 
 	}
 
