@@ -56,22 +56,19 @@ namespace UMGS.Vehicle
 			}
 		}
 		[HideInInspector] public Rigidbody attachedRigidbody;
-		//public bool IsGrounded
-		//{
-		//	get
-		//	{
-		//			if (lastGroundCheck == Time.frameCount)
-		//				return isGrounded;
-		//			lastGroundCheck = Time.frameCount;
-		//			isGrounded      = true;
-		//			foreach (Wheel wheel in wheels)
-		//			{
-		//				if (!wheel.WheelCollider.gameObject.activeSelf || !wheel.WheelCollider.isGrounded)
-		//					isGrounded = false;
-		//			}
-//
-		//			return isGrounded;
-		//		} 
+		// public bool IsGroundedAllWheels
+		// {
+		// 	get
+		// 	{
+		// 		foreach (Wheel wheel in wheels)
+		// 		{
+		// 			if (wheel.Drive && (!wheel.WheelCollider.gameObject.activeSelf || !wheel.WheelCollider.isGrounded))
+		// 				isGrounded = false;
+		// 		}
+		//
+		// 		return true;
+		// 	}
+		// }
 		public float lastCollisionTime { get; private set; }
 
 		//}
@@ -155,7 +152,8 @@ namespace UMGS.Vehicle
 				attachedRigidbody.AddForce(Physics.gravity * attachedRigidbody.mass);
 				attachedRigidbody.angularVelocity = Vector3.zero;
 				//Downforce
-				attachedRigidbody.AddForce(-transform.up * (speed * downforce * 10));
+				DownForceImplementation();
+				transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, transform.eulerAngles.y, transform.eulerAngles.z), 10 * Time.deltaTime);
 			}
 			else
 			{
@@ -164,6 +162,11 @@ namespace UMGS.Vehicle
 				else //Stick Gravity
 					attachedRigidbody.AddForce(-transform.up * (Physics.gravity.magnitude * attachedRigidbody.mass));
 			}
+		}
+
+		void DownForceImplementation()
+		{
+			attachedRigidbody.AddForce(-transform.up * (speed * downforce * 10));
 		}
 
 
@@ -217,9 +220,9 @@ namespace UMGS.Vehicle
 		float ComputeSteerAngle()
 		{
 			float inputSteerAngle = steerAngle * turnInputCurve.Evaluate(ControlInput.turn);
-			float speedFactor     = Mathf.Lerp(0.1f, 1.0f, 1 - (attachedRigidbody.velocity.magnitude / maxSpeed));
+			float speedFactor     = Mathf.Lerp(0.01f, 1.0f, 1 - (attachedRigidbody.velocity.magnitude / maxSpeed / 2));
 			inputSteerAngle *= speedFactor;
-			float assistedSteerAngle = steerAngle * 0.6f * (speedFactor / 2) * Mathf.InverseLerp(1.0f, 3.0f, Mathf.Abs(steerSpeed));
+			float assistedSteerAngle = steerAngle * 0.6f * (speedFactor) * Mathf.InverseLerp(1.0f, 3.0f, Mathf.Abs(steerSpeed));
 			return Mathf.Clamp(Mathf.Lerp(0, inputSteerAngle + assistedSteerAngle, Time.deltaTime * 100 * steerSpeed), -steerAngle, +steerAngle);
 		}
 
@@ -233,6 +236,7 @@ namespace UMGS.Vehicle
 			isColliding       = true;
 			lastCollisionTime = 0;
 			sounds.ImpactAudio(other.contacts[0].point);
+			attachedRigidbody.angularVelocity = Vector3.zero;
 		}
 
 		void OnCollisionExit(Collision other)

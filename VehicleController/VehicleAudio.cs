@@ -19,6 +19,7 @@ namespace UMGS.Vehicle
 		ControlInput                                   _input;
 		bool                                           startUp = false;
 		float                                          lastSkid;
+		AudioSource skidSource, impactSource;
 
 		public void Initialize(ControlInput input)
 		{
@@ -50,14 +51,30 @@ namespace UMGS.Vehicle
 
 		public void ImpactAudio(Vector3 atPoint)
 		{
-			PlayOneTime(impact, atPoint, 0.5f, 1);
+			// PlayOneTime(impact, atPoint, 0.5f, 1);
+			if (!impactSource)
+				impactSource = CreateAudioSource(atPoint);
+			PlayIfNoPlaying(impactSource, impact, atPoint, 0.5f, 1);
 		}
 
 		public void SkidAudio(Vector3 atPoint, float volume)
 		{
-			if (Time.time - lastSkid > 2f)
-				PlayOneTime(skid, atPoint, volume * 0.2f, 1);
-			lastSkid = Time.time;
+			if (!skidSource)
+				skidSource = CreateAudioSource(atPoint);
+			PlayIfNoPlaying(skidSource, skid, atPoint, volume * 0.2f, 1);
+		}
+
+		void PlayIfNoPlaying(AudioSource source, AudioClip clip, Vector3 position, float volume, float pitch)
+		{
+			source.transform.position = position;
+			if (source.isActiveAndEnabled && !source.isPlaying)
+			{
+				source.clip         = clip;
+				source.volume       = volume;
+				source.pitch        = pitch;
+				source.dopplerLevel = 0.0f; // Doppler causes artifacts as for positioning the audio source
+				source.Play();
+			}
 		}
 
 		void PlayOneTime(AudioClip clip, Vector3 position, float volume, float pitch)
@@ -74,6 +91,12 @@ namespace UMGS.Vehicle
 			}
 
 			Object.Destroy(source.gameObject, clip.length / pitch);
+		}
+
+		AudioSource CreateAudioSource(Vector3 position)
+		{
+			AudioSource source = Object.Instantiate(othersSource, position, Quaternion.identity, othersSource.transform.parent);
+			return source;
 		}
 
 	}
