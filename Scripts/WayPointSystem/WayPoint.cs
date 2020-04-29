@@ -13,6 +13,7 @@ namespace UMGS.WayPointSystem
 		public                    WayPoint previousWayPoint;
 		public                    WayPoint nextWayPoint;
 		[Range(0.1f, 15f)] public float    width = 1;
+		public                    float    distanceFromPrevious, distanceToNext;
 
 		public Vector3 GetPositionRandom()
 		{

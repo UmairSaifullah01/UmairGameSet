@@ -1,6 +1,6 @@
 ﻿using UMGS.WayPointSystem;
 using UnityEngine;
-
+using TMPro;
 
 namespace UMGS.Vehicle
 {
@@ -26,14 +26,14 @@ namespace UMGS.Vehicle
 		public int PositionNo { get; set; }
 		public float CoveredDistance
 		{
-			get { return CoveredDistanceCal(); }
+			get => CoveredDistanceCal();
 			set { ; }
 		}
 		float           waypointdistance = 0;
 		VehicleEngine   _engine;
 		Rigidbody       _rigidbody => _engine.attachedRigidbody;
 		private Vector3 offsetTargetPos;
-
+		[SerializeField] TextMeshPro text;
 		void Start()
 		{
 			_engine         = GetComponent<VehicleEngine>();
@@ -75,6 +75,7 @@ namespace UMGS.Vehicle
 			throttle = Mathf.Clamp(accel, -1, 1);
 			turn     = Mathf.Clamp(steer, -1, 1);
 			CollisionStayReset();
+			text.text = PositionNo.ToString();
 		}
 
 		float SensorsCalculations(float accel, ref float steer)
@@ -104,7 +105,7 @@ namespace UMGS.Vehicle
 		{
 			var distance                                    = Vector3.Distance(transform.position, offsetTargetPos);
 			if (MiniMumDistance > distance) MiniMumDistance = distance;
-			if ((MiniMumDistance < distance && distance < 10f) || distance < 4f)
+			if (MiniMumDistance < distance && distance < 10f || distance < 4f)
 			{
 				UpdateNode();
 			}
@@ -147,7 +148,6 @@ namespace UMGS.Vehicle
 				//float cn = Vector3.Distance(currentWayPoint.GetPosition(), currentWayPoint.nextWayPoint.GetPosition());
 				distance += cp - c;
 			}
-
 			return distance;
 		}
 

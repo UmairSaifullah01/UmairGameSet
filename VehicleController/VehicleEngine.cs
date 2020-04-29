@@ -17,10 +17,11 @@ namespace UMGS.Vehicle
 		[Range(2,    16)] [SerializeField]                          float          diffGearing    = 4.0f;
 		[Range(0.5f, 15f)] [SerializeField]                         float          downforce      = 1.0f;
 		[SerializeField]                                            float          antiRoll;
-		[SerializeField]                                            float          maxSpeed   = 80.0f;
-		[SerializeField]                                            float          brakeForce = 1500.0f;
-		[Range(0f,     50.0f)] [SerializeField]                     float          steerAngle = 30.0f;
-		[Range(0.001f, 1.0f)] [SerializeField]                      float          steerSpeed = 0.2f;
+		[SerializeField]                                            float          maxSpeed       = 80.0f;
+		[SerializeField]                                            float          maxAngularDrag = 5f;
+		[SerializeField]                                            float          brakeForce     = 1500.0f;
+		[Range(0f,     50.0f)] [SerializeField]                     float          steerAngle     = 30.0f;
+		[Range(0.001f, 1.0f)] [SerializeField]                      float          steerSpeed     = 0.2f;
 		[SerializeField]                                            Transform      centerOfMass;
 		[UToolbar("Wheels")] [SerializeField]                       Wheel[]        wheels;
 		[Header("Easy Suspension")] [Range(0, 20)] [SerializeField] float          naturalFrequency = 10;
@@ -88,7 +89,8 @@ namespace UMGS.Vehicle
 			{
 				attachedRigidbody.centerOfMass = centerOfMass.localPosition;
 			}
-
+			
+			attachedRigidbody.maxDepenetrationVelocity = 8.0f;
 			sounds.Initialize(ControlInput);
 		}
 
@@ -141,6 +143,8 @@ namespace UMGS.Vehicle
 
 			//max Speed Counter
 			attachedRigidbody.velocity = attachedRigidbody.velocity.normalized * Mathf.Clamp(attachedRigidbody.velocity.magnitude, 0, desireSpeed);
+			//MaxAngular speed
+			attachedRigidbody.angularDrag = Mathf.Lerp(0.01f, maxAngularDrag, attachedRigidbody.velocity.magnitude / maxSpeed);
 			ApplyAntiRoll();
 			//Grounded Checking....
 			if (!IsGrounded)

@@ -1,4 +1,6 @@
-﻿using UMGS.WayPointSystem;
+﻿using System.Collections;
+using TMPro;
+using UMGS.WayPointSystem;
 using UnityEngine;
 
 public class PositionStatus : MonoBehaviour, IPositionStats
@@ -6,17 +8,21 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 
 	private          WayPoint        currentWayPoint;
 	[SerializeField] WayPointManager Manager;
+	[SerializeField] int             fromIndex, endIndex;
+	WayPoint[]                       wayPoints;
+	float                            locationUpdateRate   = 0.1f;
+	int                              currentWayPointIndex = 0;
+	[SerializeField] TextMeshPro     text;
 
 	void Start()
 	{
 		currentWayPoint = Manager.head;
+		wayPoints       = Manager.CopyPoints(fromIndex, endIndex - fromIndex);
+		StartCoroutine(CheckWaypointDistance());
 	}
 
 	// Update is called once per frame
-	void FixedUpdate()
-	{
-		CheckWaypointDistance();
-	}
+
 
 	public int Id         { get; set; }
 	public int PositionNo { get; set; }
@@ -27,25 +33,42 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 	}
 	float waypointdistance = 0;
 
-	void CheckWaypointDistance()
+	IEnumerator CheckWaypointDistance()
 	{
-		Manager.path.Sort((a, b) => Vector3.Distance(transform.position, a.GetPosition()).CompareTo(Vector3.Distance(transform.position, b.GetPosition())));
-		currentWayPoint  = Manager.path[0];
-		waypointdistance = Manager.DistanceToWaypoint(currentWayPoint);
+		while (true)
+		{
+			yield return new WaitForSeconds(locationUpdateRate);
+			currentWayPointIndex = MinimumDistance();
+			currentWayPoint      = wayPoints[currentWayPointIndex];
+			waypointdistance     = Manager.GetDistance(currentWayPoint, currentWayPointIndex - fromIndex);
+			text.text            = PositionNo.ToString();
+		}
+
+		yield return null;
+	}
+
+	int MinimumDistance()
+	{
+		float minidis = Vector3.Distance(wayPoints[0].GetPosition(), transform.position);
+		int   Index   = 0;
+		for (int i = 0; i < wayPoints.Length; i++)
+		{
+			float dist = Vector3.Distance(wayPoints[i].GetPosition(), transform.position);
+			if (!(dist < minidis)) continue;
+			Index   = i;
+			minidis = dist;
+		}
+
+		return Index;
 	}
 
 	float CoveredDistanceCal()
 	{
 		float distance = waypointdistance;
-		// if (currentWayPoint.previousWayPoint)
-		// {
-		// 	float c = Vector3.Distance(transform.position, currentWayPoint.GetPosition());
-		// 	// float p  = Vector3.Distance(transform.position,            currentWayPoint.previousWayPoint.GetPosition());
-		// 	float cp = Vector3.Distance(currentWayPoint.GetPosition(), currentWayPoint.previousWayPoint.GetPosition());
-		// 	// float n  = Vector3.Distance(transform.position,            currentWayPoint.nextWayPoint.GetPosition());
-		// 	//float cn = Vector3.Distance(currentWayPoint.GetPosition(), currentWayPoint.nextWayPoint.GetPosition());
-		// 	distance += cp - c;
-		// }
+		float cn       = currentWayPoint.distanceToNext;
+		float c        = Vector3.Distance(transform.position, currentWayPoint.GetPosition());
+		float n        = Vector3.Distance(transform.position, currentWayPoint.nextWayPoint.GetPosition());
+		distance += n > cn ? c : -c;
 		return distance;
 	}
 

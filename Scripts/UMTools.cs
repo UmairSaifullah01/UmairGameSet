@@ -134,16 +134,37 @@ public static class UMTools
 	/// <summary>
 	/// Minimum the distance form list.
 	/// </summary>
-	public static int MiniDistanceFormlist(this Transform trans, ref List<GameObject> AllPoint)
+	public static int MiniDistanceFormlist(this Transform trans, List<GameObject> AllPoint)
 	{
 		float minidis = Vector3.Distance(AllPoint[0].transform.position, trans.position);
 		int   Index   = 0;
 		for (int i = 0; i < AllPoint.Count; i++)
 		{
-			if (Vector3.Distance(AllPoint[i].transform.position, trans.position) < minidis)
+			var dist = Vector3.Distance(AllPoint[i].transform.position, trans.position);
+			if (dist < minidis)
 			{
 				Index   = i;
-				minidis = Vector3.Distance(AllPoint[i].transform.position, trans.position);
+				minidis = dist;
+			}
+		}
+
+		return Index;
+	}
+
+	/// <summary>
+	/// Minimum the distance form array.
+	/// </summary>
+	public static int MinimumDistance(this Transform trans, Transform[] AllPoint)
+	{
+		float minidis = Vector3.Distance(AllPoint[0].position, trans.position);
+		int   Index   = 0;
+		for (int i = 0; i < AllPoint.Length; i++)
+		{
+			var dist = Vector3.Distance(AllPoint[i].position, trans.position);
+			if (dist < minidis)
+			{
+				Index   = i;
+				minidis = dist;
 			}
 		}
 
@@ -197,6 +218,7 @@ public static class UMTools
 		{
 			subCollider.Append(col);
 		}
+
 		return subCollider;
 	}
 
