@@ -47,6 +47,12 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 		yield return null;
 	}
 
+	public void RespwanPosition()
+	{
+		transform.position = currentWayPoint.GetPosition() + Vector3.up * 3;
+		transform.rotation = Quaternion.LookRotation((currentWayPoint.nextWayPoint.GetPosition() - currentWayPoint.GetPosition()).normalized, Vector3.up);
+	}
+
 	int MinimumDistance()
 	{
 		float minidis = Vector3.Distance(wayPoints[0].GetPosition(), transform.position);
