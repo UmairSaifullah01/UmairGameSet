@@ -7,24 +7,27 @@ namespace UMGS.Vehicle
 {
 
 
-	[UClassHeader("Vehicle Engine")]
-	public class VehicleEngine : UBehaviour
+	[UClassHeader("Vehicle Controller")]
+	public class VehicleController : UBehaviour
 	{
 
 		// SerializeFields
-		[UToolbar("Engine")] [SerializeField]                       AnimationCurve motorTorque    = new AnimationCurve(new Keyframe(0, 200), new Keyframe(50, 300), new Keyframe(200, 0));
-		[SerializeField]                                            AnimationCurve turnInputCurve = AnimationCurve.Linear(-1.0f, -1.0f, 1.0f, 1.0f);
-		[Range(2,    16)] [SerializeField]                          float          diffGearing    = 4.0f;
-		[Range(0.5f, 15f)] [SerializeField]                         float          downforce      = 1.0f;
-		[SerializeField]                                            float          antiRoll;
-		[SerializeField]                                            float          maxSpeed       = 80.0f;
-		[SerializeField]                                            float          maxAngularDrag = 5f;
-		[SerializeField]                                            float          brakeForce     = 1500.0f;
-		[Range(0f,     50.0f)] [SerializeField]                     float          steerAngle     = 30.0f;
-		[Range(0.001f, 1.0f)] [SerializeField]                      float          steerSpeed     = 0.2f;
-		[SerializeField]                                            Transform      centerOfMass;
-		[UToolbar("Wheels")] [SerializeField]                       Wheel[]        wheels;
-		[Header("Easy Suspension")] [Range(0, 20)] [SerializeField] float          naturalFrequency = 10;
+		[UToolbar("Engine")] [SerializeField]   AnimationCurve motorTorque    = new AnimationCurve(new Keyframe(0, 200), new Keyframe(50, 300), new Keyframe(200, 0));
+		[SerializeField]                        AnimationCurve turnInputCurve = AnimationCurve.Linear(-1.0f, -1.0f, 1.0f, 1.0f);
+		[Range(2,    16)] [SerializeField]      float          diffGearing    = 4.0f;
+		[Range(0.5f, 15f)] [SerializeField]     float          downforce      = 1.0f;
+		[SerializeField]                        float          antiRoll;
+		[SerializeField]                        float          maxSpeed       = 80.0f;
+		[SerializeField]                        float          maxAngularDrag = 5f;
+		[SerializeField]                        float          brakeForce     = 1500.0f;
+		[Range(0f,     50.0f)] [SerializeField] float          steerAngle     = 30.0f;
+		[Range(0.001f, 1.0f)] [SerializeField]  float          steerSpeed     = 0.2f;
+		[SerializeField]                        bool           isDriftActive;
+		[SerializeField]                        float          driftIntensity;
+
+		[SerializeField]                                            Transform centerOfMass;
+		[UToolbar("Wheels")] [SerializeField]                       Wheel[]   wheels;
+		[Header("Easy Suspension")] [Range(0, 20)] [SerializeField] float     naturalFrequency = 10;
 
 		[Range(0, 3)] [SerializeField] float dampingRatio = 0.8f;
 
@@ -81,6 +84,7 @@ namespace UMGS.Vehicle
 		float[] travelValues    = new float[4];
 		float   desireSpeed;
 
+
 		void Start()
 		{
 			attachedRigidbody            = GetComponent<Rigidbody>();
@@ -89,8 +93,8 @@ namespace UMGS.Vehicle
 			{
 				attachedRigidbody.centerOfMass = centerOfMass.localPosition;
 			}
-			
-			attachedRigidbody.maxDepenetrationVelocity = 8.0f;
+
+//			attachedRigidbody.maxDepenetrationVelocity = 8.0f;
 			sounds.Initialize(ControlInput);
 		}
 
@@ -165,6 +169,19 @@ namespace UMGS.Vehicle
 				if (speed < 5f && transform.eulerAngles.z > 90) attachedRigidbody.AddForce(Physics.gravity * attachedRigidbody.mass);
 				else //Stick Gravity
 					attachedRigidbody.AddForce(-transform.up * (Physics.gravity.magnitude * attachedRigidbody.mass));
+			}
+
+			if (ControlInput.brake > .5f && isDriftActive)
+			{
+				Vector3 driftForce = -transform.right;
+				driftForce.y = 0.0f;
+				driftForce.Normalize();
+				if (Math.Abs(ControlInput.turn) > 0.01f)
+					driftForce *= attachedRigidbody.mass * speed / 7f * ControlInput.throttle * ControlInput.turn / steerAngle;
+				Vector3 driftTorque = transform.up * (0.1f * ControlInput.turn) / steerAngle;
+				attachedRigidbody.AddForce(driftForce                           * driftIntensity, ForceMode.Force);
+				attachedRigidbody.AddTorque(driftTorque                         * driftIntensity, ForceMode.VelocityChange);
+				print("Drift");
 			}
 		}
 

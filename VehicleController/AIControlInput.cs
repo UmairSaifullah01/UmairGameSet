@@ -6,7 +6,7 @@ namespace UMGS.Vehicle
 {
 
 
-	[RequireComponent(typeof(VehicleEngine))]
+	[RequireComponent(typeof(VehicleController))]
 	public class AIControlInput : ControlInput, IPositionStats
 	{
 
@@ -30,13 +30,13 @@ namespace UMGS.Vehicle
 			set { ; }
 		}
 		float           waypointdistance = 0;
-		VehicleEngine   _engine;
-		Rigidbody       _rigidbody => _engine.attachedRigidbody;
+		VehicleController   Controller;
+		Rigidbody       _rigidbody => Controller.attachedRigidbody;
 		private Vector3 offsetTargetPos;
 		[SerializeField] TextMeshPro text;
 		void Start()
 		{
-			_engine         = GetComponent<VehicleEngine>();
+			Controller         = GetComponent<VehicleController>();
 			currentWayPoint = path.head;
 			offsetTargetPos = currentWayPoint.GetPosition(OffsetX);
 			_rigidbody.OnTriggerEnter((col) =>
@@ -123,7 +123,7 @@ namespace UMGS.Vehicle
 		//Sensors
 		void CollisionStayReset()
 		{
-			if (_engine.lastCollisionTime > 3)
+			if (Controller.lastCollisionTime > 3)
 			{
 				//Reset
 				transform.rotation = Quaternion.LookRotation((offsetTargetPos - transform.position).normalized, Vector3.up);
