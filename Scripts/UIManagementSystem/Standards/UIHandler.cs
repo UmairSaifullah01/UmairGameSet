@@ -7,42 +7,43 @@ public abstract class UIHandler : MonoBehaviour
 	public PanelBehaviour[] panels;
 	public IPanel           currentPanel, previousPanel;
 
-	public virtual void ActivatePanel(string panelName)
+	public virtual void ShowPanel(string panelName, UMUI.Data data = null)
 	{
 		foreach (IPanel panel in panels)
 		{
 			if (panel.Name == panelName)
 			{
-				panel.Activate();
+				panel.Show(data);
 				previousPanel = currentPanel;
 				currentPanel  = panel;
+				
 			}
 			else
 			{
 				if (panel.panelObject.activeSelf)
-					panel.Deactivate();
+					panel.Hide();
 			}
 		}
 	}
 
-	public virtual void Deactivate(string panelName)
+	public virtual void Hide(string panelName)
 	{
 		foreach (IPanel panel in panels)
 		{
 			if (panel.Name == panelName && panel.panelObject.activeSelf)
 			{
-				panel.Deactivate();
+				panel.Hide();
 				previousPanel = panel;
 			}
 		}
 	}
 
-	public virtual void DeactivateAll()
+	public virtual void HideAll()
 	{
 		foreach (IPanel panel in panels)
 		{
 			if (panel.panelObject.activeSelf)
-				panel.Deactivate();
+				panel.Hide();
 		}
 	}
 
@@ -51,25 +52,31 @@ public abstract class UIHandler : MonoBehaviour
 		return panels.FirstOrDefault(panel => panel.Name == panelName);
 	}
 
-	public void CallPreviousPanel()
+	public void CallPreviousPanel(UMUI.Data data)
 	{
 		var temp = currentPanel;
-		currentPanel?.Deactivate();
-		previousPanel?.Activate();
+		currentPanel?.Hide();
+		previousPanel?.Show(data);
 		currentPanel  = previousPanel;
 		previousPanel = temp;
 	}
 
-	public virtual void ActivatePanelAdditive(string panelName)
+	public virtual void ShowAdditivePanel(string panelName, UMUI.Data data)
 	{
 		foreach (var panel in panels)
 		{
 			if (panel.Name == panelName)
 			{
-				panel.Activate();
+				panel.Show(data);
 				currentPanel = panel;
 			}
 		}
+	}
+
+	private void OnValidate()
+	{
+		if (gameObject.name != this.GetType().Name)
+			gameObject.name = this.GetType().Name;
 	}
 
 }

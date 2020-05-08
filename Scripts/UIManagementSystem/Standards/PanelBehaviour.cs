@@ -9,8 +9,9 @@ public class PanelBehaviour : MonoBehaviour, IPanel
 	public                   string     Name        => m_name;
 	public                   GameObject panelObject => gameObject;
 	public                   Button[]   Buttons;
+	[HideInInspector] public UIHandler  handler;
 
-	protected virtual  void Start()
+	protected virtual void Start()
 	{
 		for (int i = 0; i < Buttons.Length; i++)
 		{
@@ -19,15 +20,16 @@ public class PanelBehaviour : MonoBehaviour, IPanel
 		}
 	}
 
-	public virtual void Activate()
+	public virtual void Show(UMUI.Data data)
 	{
-		EventHandler.AnalyticsEvent.Send($"{Name}_Panel_Opened");
 		panelObject.SetActive(true);
+		panelObject.transform.SetAsLastSibling();
+		EventHandler.AnalyticsEvent.Send($"{Name}_Opened");
 	}
 
-	public virtual void Deactivate()
+	public virtual void Hide()
 	{
-		EventHandler.AnalyticsEvent.Send($"{Name}_Panel_Closed");
+		EventHandler.AnalyticsEvent.Send($"{Name}_Closed");
 		panelObject.SetActive(false);
 	}
 

@@ -13,9 +13,9 @@ public class TimedBaseGenericPanel : GenericPanel
 
 	public void Show(string title, string message, string cancelButtonText, UnityAction onCancel, bool btn1, UnityAction btn1Event, string btn1Text, float duration)
 	{
-		positivebtn.onClick.AddListener(StopAllCoroutines);
 		Show(title, message, cancelButtonText, onCancel, btn1, btn1Event, btn1Text);
-		negativebtn.gameObject.SetActive(false);
+		Buttons[0].onClick.AddListener(StopAllCoroutines);
+		Buttons[1].gameObject.SetActive(false);
 		this.duration     = duration;
 		CounterText.text  = duration.ToString("00");
 		CounterText.color = Color.green;
@@ -32,7 +32,7 @@ public class TimedBaseGenericPanel : GenericPanel
 			yield return new WaitForFixedUpdate();
 		}
 
-		negativebtn.onClick.Invoke();
+		Buttons[1].onClick.Invoke();
 	}
 
 }

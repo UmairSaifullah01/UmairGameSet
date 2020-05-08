@@ -3,6 +3,8 @@
 
 namespace UMGS.Vehicle
 {
+
+
 	public class UserControlInput : ControlInput
 	{
 
@@ -10,6 +12,7 @@ namespace UMGS.Vehicle
 		[SerializeField] string ThrottleInput  = "Vertical";
 		[SerializeField] string TurnInput      = "Horizontal";
 		[SerializeField] string HandBrakeInput = "Jump";
+		[SerializeField] string DriftInput     = "Jump";
 
 		float GetInput(string input)
 		{
@@ -62,7 +65,10 @@ namespace UMGS.Vehicle
 
 			throttle = throttleInput;
 			brake    = brakeInput;
+			Drift    = Mathf.Clamp01(GetInput(DriftInput));
 		}
 
 	}
+
+
 }

@@ -8,14 +8,14 @@ namespace UMGS
     {
     
         public Currency Name;
-        public bool IsAvailable => DataHandler.Contains(Name.ToString());
+        public bool IsAvailable => DataManager.Contains(Name.ToString());
 
         public float value
         {
-            get => DataHandler.Get<float> (Name.ToString ());
+            get => DataManager.Get<float> (Name.ToString ());
             set
             {
-                DataHandler.Save (Name.ToString (), value);
+                DataManager.Save (Name.ToString (), value);
                 OnPropertyChanged ();
             }
         }

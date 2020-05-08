@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -47,24 +48,34 @@ public static class SceneLoader
 
 	public static void LoadSceneAsync(int activeIndex, params string[] sceneNames)
 	{
-		LoadMultiScenes(activeIndex, sceneNames);
+		LoadMultiScenes(activeIndex, false, sceneNames);
 	}
+
+	public static void LoadSceneAdditiveAsync(int activeIndex, params string[] sceneNames)
+	{
+		LoadMultiScenes(activeIndex, true, sceneNames);
+	}
+
 	public static void LoadSceneAsync(params string[] sceneNames)
 	{
-		LoadMultiScenes(0, sceneNames);
+		LoadMultiScenes(0, false, sceneNames);
 	}
-	static void LoadMultiScenes(int activeIndex, string[] sceneNames)
+
+	static void LoadMultiScenes(int activeIndex, bool additive, string[] sceneNames)
 	{
 		OnSceneStartLoadEvent?.Invoke();
 		int scenes = 0;
-		SceneManager.LoadSceneAsync(sceneNames[scenes]);
+		if (additive)
+			SceneManager.LoadSceneAsync(sceneNames[scenes], LoadSceneMode.Additive);
+		else
+			SceneManager.LoadSceneAsync(sceneNames[scenes]);
 
 		void OnSceneManagerOnsceneLoaded(Scene scene, LoadSceneMode mode)
 		{
 			scenes++;
 			if (scenes >= sceneNames.Length)
 			{
-				if (activeIndex != 0)
+				if (activeIndex != 0 || additive)
 					SetActiveScene(sceneNames[activeIndex]);
 				OnSceneEndLoadEvent?.Invoke();
 				SceneManager.sceneLoaded -= OnSceneManagerOnsceneLoaded;
@@ -77,9 +88,33 @@ public static class SceneLoader
 		SceneManager.sceneLoaded += OnSceneManagerOnsceneLoaded;
 	}
 
+	public static void UnloadScenes(params string[] sceneNames)
+	{
+		foreach (string name in sceneNames)
+		{
+			SceneManager.UnloadSceneAsync(name);
+		}
+	}
+
 	public static string GetActiveName()
 	{
 		return SceneManager.GetActiveScene().name;
+	}
+
+	public static IEnumerator ReLoadAdditiveScene(string sceneName)
+	{
+		OnSceneStartLoadEvent?.Invoke();
+		operation = SceneManager.UnloadSceneAsync(sceneName);
+		yield return new WaitUntil(() => operation.isDone);
+
+		void SceneManagerOnsceneLoaded(Scene scene, LoadSceneMode mode)
+		{
+			OnSceneEndLoadEvent?.Invoke();
+			SceneManager.sceneLoaded -= SceneManagerOnsceneLoaded;
+		}
+
+		SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
+		operation                =  SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 	}
 
 	public static void ReLoadScene()

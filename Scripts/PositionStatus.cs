@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using TMPro;
 using UMGS.WayPointSystem;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 	float                            locationUpdateRate   = 0.1f;
 	int                              currentWayPointIndex = 0;
 	[SerializeField] TextMeshPro     text;
+	public           GameObject      Effect;
 
 	void Start()
 	{
@@ -47,10 +49,19 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 		yield return null;
 	}
 
-	public void RespwanPosition()
+	void Update()
+	{
+		if (SimpleInput.GetButtonDown("Respawn"))
+		{
+			RespawnPosition();
+		}
+	}
+
+	public void RespawnPosition()
 	{
 		transform.position = currentWayPoint.GetPosition() + Vector3.up * 3;
 		transform.rotation = Quaternion.LookRotation((currentWayPoint.nextWayPoint.GetPosition() - currentWayPoint.GetPosition()).normalized, Vector3.up);
+		Instantiate(Effect, transform);
 	}
 
 	int MinimumDistance()

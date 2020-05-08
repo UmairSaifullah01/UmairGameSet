@@ -2,49 +2,51 @@
 using UMGS;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 
 public class GenericPanel : PanelBehaviour
 {
-    [SerializeField] protected Button positivebtn, negativebtn;
-    [SerializeField] protected TextMeshProUGUI positiveText, negativeText, titleText, descriptionText;
 
-    public void Show(string title, string message, string cancelButtonText, UnityAction onCancel, bool btn1,
-        UnityAction btn1Event, string btn1Text)
-    {
-        negativebtn.onClick.RemoveAllListeners();
-        positivebtn.onClick.RemoveAllListeners();
-        negativebtn.gameObject.SetActive(true);
-        Activate();
-        titleText.text = title;
-        descriptionText.text = message;
-        negativeText.text = cancelButtonText;
-        negativebtn.onClick.AddListener(Deactivate);
-        if (onCancel != null)
-        {
-            negativebtn.onClick.AddListener(EventHandler.ButtonSound.Send);
-            negativebtn.onClick.AddListener(onCancel);
-        }
+	[SerializeField] protected TextMeshProUGUI positiveText, negativeText, titleText, descriptionText;
 
-        if (btn1)
-        {
-            positivebtn.gameObject.SetActive(true);
-            if (btn1Event != null)
-            {
-                positivebtn.onClick.AddListener(EventHandler.ButtonSound.Send);
-                positivebtn.onClick.AddListener(Deactivate);
-                positivebtn.onClick.AddListener(btn1Event);
-            }
+	public void Show(string title, string message, string cancelButtonText, UnityAction onCancel, bool btn1, UnityAction btn1Event, string btn1Text)
+	{
+		Buttons[1].onClick.RemoveAllListeners(); // negative
+		Buttons[0].onClick.RemoveAllListeners(); //Position
+		Buttons[1].gameObject.SetActive(true);
+		panelObject.SetActive(true);
+		titleText.text       = title;
+		descriptionText.text = message;
+		negativeText.text    = cancelButtonText;
+		Buttons[1].onClick.AddListener(Hide);
+		if (onCancel != null)
+		{
+			Buttons[1].onClick.AddListener(EventHandler.ButtonSound.Send);
+			Buttons[1].onClick.AddListener(onCancel);
+		}
 
-            positiveText.text = btn1Text;
-        }
-    }
+		if (btn1)
+		{
+			Buttons[0].gameObject.SetActive(true);
+			if (btn1Event != null)
+			{
+				Buttons[0].onClick.AddListener(EventHandler.ButtonSound.Send);
+				Buttons[0].onClick.AddListener(Hide);
+				Buttons[0].onClick.AddListener(btn1Event);
+			}
 
-    public override void Deactivate()
-    {
-        base.Deactivate();
-        positivebtn.gameObject.SetActive(false);
-        negativebtn.gameObject.SetActive(false);
-    }
+			positiveText.text = btn1Text;
+		}
+
+		EventHandler.AnalyticsEvent.Send($"{title}_Panel_Opened");
+	}
+
+	public override void Hide()
+	{
+		panelObject.SetActive(false);
+		EventHandler.AnalyticsEvent.Send($"{titleText.text}_Panel_Opened");
+		Buttons[0].gameObject.SetActive(false);
+		Buttons[1].gameObject.SetActive(false);
+	}
+
 }

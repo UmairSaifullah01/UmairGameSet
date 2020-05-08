@@ -28,14 +28,15 @@ public class PopupManager : UIHandler
 		{
 			instance = this;
 			DontDestroyOnLoad(gameObject);
-			SceneLoader.OnSceneStartLoadEvent += () => ActivatePanel("Loading");
-			SceneLoader.OnSceneEndLoadEvent   += () => Deactivate("Loading");
+			SceneLoader.OnSceneStartLoadEvent += () => ShowPanel("Loading", null);
+			SceneLoader.OnSceneEndLoadEvent   += () => Hide("Loading");
 		}
 		else
 		{
 			Destroy(gameObject);
 		}
-		DeactivateAll();
+
+		HideAll();
 	}
 
 	private void OnValidate()
@@ -50,12 +51,12 @@ public class PopupManager : UIHandler
 
 	public void RemoveAds()
 	{
-		ActivatePanel("RemoveAds");
+		ShowPanel("RemoveAds", null);
 	}
 
 	public void UnlockAllGame()
 	{
-		ActivatePanel("UnlockAllGame");
+		ShowPanel("UnlockAllGame", null);
 	}
 
 	public void SoundButton()
@@ -80,7 +81,7 @@ public class PopupManager : UIHandler
 
 	private void Show(string title, string message, string cancelButtonText, UnityAction onCancel, bool btn1, UnityAction btn1Event, string btn1Text, bool smallSize = true)
 	{
-		DeactivateAll();
+		HideAll();
 		((!smallSize) ? genericPanel : genericPanelSmall).Show(title, message, cancelButtonText, onCancel, btn1, btn1Event, btn1Text);
 	}
 
@@ -97,7 +98,7 @@ public class PopupManager : UIHandler
 	public bool IsCurrencyValid(Currency name, int value)
 	{
 		if (VCHandler.Instance != null && VCHandler.Instance.GetValue(name) >= value) return true;
-		ActivatePanel("NotEnoughCash");
+		ShowPanel("NotEnoughCash", null);
 		return false;
 	}
 

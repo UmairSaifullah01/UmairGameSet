@@ -23,7 +23,7 @@ namespace UMGS.Vehicle
 		[Range(0f,     50.0f)] [SerializeField] float          steerAngle     = 30.0f;
 		[Range(0.001f, 1.0f)] [SerializeField]  float          steerSpeed     = 0.2f;
 		[SerializeField]                        bool           isDriftActive;
-		[SerializeField]                        float          driftIntensity;
+		[SerializeField] [Range(0.0f, 2f)]      float          driftIntensity;
 
 		[SerializeField]                                            Transform centerOfMass;
 		[UToolbar("Wheels")] [SerializeField]                       Wheel[]   wheels;
@@ -171,7 +171,7 @@ namespace UMGS.Vehicle
 					attachedRigidbody.AddForce(-transform.up * (Physics.gravity.magnitude * attachedRigidbody.mass));
 			}
 
-			if (ControlInput.brake > .5f && isDriftActive)
+			if (ControlInput.Drift > 0.5f && isDriftActive)
 			{
 				Vector3 driftForce = -transform.right;
 				driftForce.y = 0.0f;
