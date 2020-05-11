@@ -12,8 +12,9 @@ public class UIEditorWindow : EditorWindow
 	static void Init()
 	{
 		var window = GetWindow<UIEditorWindow>();
-		window.titleContent = new GUIContent("UI Window");
-		path                = EditorPrefs.GetString("path");
+		window.titleContent      =  new GUIContent("UI Window");
+		path                     =  EditorPrefs.GetString("path");
+		SceneView.duringSceneGui += OnSceneGUI;
 	}
 
 	void OnGUI()
@@ -34,6 +35,64 @@ public class UIEditorWindow : EditorWindow
 		CreateButton();
 		CreateText();
 		CreateScript();
+		AddMeshCollider();
+		NameOrganizer();
+	}
+
+	string before, after;
+
+	void NameOrganizer()
+	{
+		EditorGUILayout.BeginVertical("box");
+		EditorGUILayout.LabelField("Name Organizer");
+		before = EditorGUILayout.TextField("", before);
+		after  = EditorGUILayout.TextField("", after);
+		if (GUILayout.Button("Organize"))
+		{
+			var parent = Selection.activeGameObject.transform;
+			for (int i = 0; i < parent.childCount; i++)
+			{
+				parent.GetChild(i).name = $"{before} {i + 1} {after}";
+			}
+		}
+
+		EditorGUILayout.EndVertical();
+	}
+
+	Renderer[] renderers;
+
+	void AddMeshCollider()
+	{
+		EditorGUILayout.BeginVertical("box");
+		EditorGUILayout.LabelField("Panel");
+		if (GUILayout.Button("Find"))
+		{
+			renderers = FindObjectsOfType<Renderer>();
+		}
+
+		if (renderers != null && renderers.Length > 0)
+		{
+			if (GUILayout.Button("Add"))
+			{
+				foreach (Renderer renderer in renderers)
+				{
+					Collider collider = renderer.gameObject.GetComponent<Collider>();
+					if (collider) continue;
+					renderer.gameObject.AddComponent<MeshCollider>();
+				}
+			}
+
+			if (GUILayout.Button("Remove"))
+			{
+				foreach (Renderer renderer in renderers)
+				{
+					Collider collider = renderer.gameObject.GetComponent<Collider>();
+					if (collider) DestroyImmediate(collider);
+				}
+			}
+		}
+
+		EditorGUILayout.EndVertical();
 	}
 
 	string panelName = "";
@@ -49,6 +108,21 @@ public class UIEditorWindow : EditorWindow
 		}
 
 		EditorGUILayout.EndVertical();
+	}
+
+	static void OnSceneGUI(SceneView sceneView)
+	{
+		if (Event.current.type != EventType.KeyDown) return;
+		if (Event.current.keyCode == KeyCode.G)
+		{
+			Ray        worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+			RaycastHit hitInfo;
+			if (Physics.Raycast(worldRay, out hitInfo))
+			{
+				Event.current.Use();
+				Selection.activeGameObject.transform.position = hitInfo.point;
+			}
+		}
 	}
 
 	GameObject obj        = null;

@@ -21,7 +21,12 @@ public static class SceneLoader
 		}
 
 		SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
-		operation                =  isAdditive ? SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive) : SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
+		return LoadSceneAsyncSimple(name, isAdditive);
+	}
+
+	public static AsyncOperation LoadSceneAsyncSimple(string name, bool isAdditive)
+	{
+		operation = isAdditive ? SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive) : SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
 		return operation;
 	}
 

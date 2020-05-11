@@ -39,6 +39,7 @@ namespace UMGS
 		//Race Game Events
 
 		public static EventListener<string> OnTimeUpdate = new EventListener<string>();
+		public static EventListener<int>    OnChangeCar  = new EventListener<int>();
 
 	}
 

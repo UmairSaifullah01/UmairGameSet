@@ -19,11 +19,11 @@ public class WheelSkid : MonoBehaviour
 	WheelCollider wheelCollider;
 	WheelHit      wheelHitInfo;
 
-	const float   SKID_FX_SPEED         = 0.5f;  // Min side slip speed in m/s to start showing a skid
-	const float   MAX_SKID_INTENSITY    = 10.0f; // m/s where skid opacity is at full intensity
-	const float   WHEEL_SLIP_MULTIPLIER = 2.0f; // For wheelspin. Adjust how much skids show
-	int           lastSkid              = -1;    // Array index for the skidmarks controller. Index of last skidmark piece this wheel used
-	float         lastFixedUpdateTime;
+	const float       SKID_FX_SPEED         = 0.5f;  // Min side slip speed in m/s to start showing a skid
+	const float       MAX_SKID_INTENSITY    = 10.0f; // m/s where skid opacity is at full intensity
+	const float       WHEEL_SLIP_MULTIPLIER = 2.0f;  // For wheelspin. Adjust how much skids show
+	int               lastSkid              = -1;    // Array index for the skidmarks controller. Index of last skidmark piece this wheel used
+	float             lastFixedUpdateTime;
 	VehicleController Controller;
 	// #### UNITY INTERNAL METHODS ####
 
@@ -31,7 +31,9 @@ public class WheelSkid : MonoBehaviour
 	{
 		wheelCollider       = GetComponent<WheelCollider>();
 		lastFixedUpdateTime = Time.time;
-		Controller              = GetComponentInParent<VehicleController>();
+		Controller          = GetComponentInParent<VehicleController>();
+		if (!skidmarksController)
+			skidmarksController = FindObjectOfType<Skidmarks>();
 	}
 
 	protected void FixedUpdate()

@@ -64,6 +64,7 @@ public static class UMTools
 	public static void SetPosition(this Transform trans, Transform trans2)
 	{
 		trans.position = trans2.position;
+		trans.rotation = trans2.rotation;
 	}
 
 	public static void OptimizeRenderResolution()

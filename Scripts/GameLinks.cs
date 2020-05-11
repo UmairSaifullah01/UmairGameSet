@@ -7,5 +7,6 @@
 	public static string worldScene      = "WorldScene";
 	public static string uiScene         = "UIScene";
 	public static string controllerScene = "Controller";
+	public static string garage = "Garage";
 
 }

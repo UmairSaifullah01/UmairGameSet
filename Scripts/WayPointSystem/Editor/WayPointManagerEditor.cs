@@ -162,7 +162,7 @@ namespace UMGS.WayPointSystem
 					var wayPoint = wayPointObject.GetComponent<WayPoint>();
 					wayPoint.width             = _wayPointManager.width;
 					Selection.activeGameObject = wayPointObject;
-					if (wayPointRoot.childCount > 1)
+					if (wayPointRoot.childCount > 0)
 					{
 						wayPoint.previousWayPoint              = wayPointRoot.GetChild(wayPointRoot.childCount - 2).GetComponent<WayPoint>();
 						wayPoint.previousWayPoint.nextWayPoint = wayPoint;
