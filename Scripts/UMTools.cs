@@ -44,9 +44,48 @@ public static class UMTools
 		return false;
 	}
 
+	public static Bounds OrthographicBounds(this Camera camera)
+	{
+		float  screenAspect = (float) Screen.width    / (float) Screen.height;
+		float  cameraHeight = camera.orthographicSize * 2;
+		Bounds bounds       = new Bounds(camera.transform.position, new Vector3(cameraHeight * screenAspect, cameraHeight, 0));
+		return bounds;
+	}
+
 	public static bool FindTagInParent(this Transform t, string tagString)
 	{
 		return t.CompareTag(tagString) || (t.parent != null && FindTagInParent(t.parent, tagString));
+	}
+
+	/// <summary>
+	/// Attaches a component to the given component's game object.
+	/// </summary>
+	/// <param name="component">Component.</param>
+	/// <returns>Newly attached component.</returns>
+	public static T AddComponent<T>(this Component component) where T : Component
+	{
+		return component.gameObject.AddComponent<T>();
+	}
+
+	/// <summary>
+	/// Gets a component attached to the given component's game object.
+	/// If one isn't found, a new one is attached and returned.
+	/// </summary>
+	/// <param name="component">Component.</param>
+	/// <returns>Previously or newly attached component.</returns>
+	public static T GetOrAddComponent<T>(this Component component) where T : Component
+	{
+		return component.GetComponent<T>() ?? component.AddComponent<T>();
+	}
+
+	/// <summary>
+	/// Checks whether a component's game object has a component of type T attached.
+	/// </summary>
+	/// <param name="component">Component.</param>
+	/// <returns>True when component is attached.</returns>
+	public static bool HasComponent<T>(this Component component) where T : Component
+	{
+		return component.GetComponent<T>() != null;
 	}
 
 	public static void SetPosition(this Transform trans, float value, Axis axis = Axis.x)

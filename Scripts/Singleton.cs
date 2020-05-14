@@ -3,7 +3,8 @@
 
 namespace UMGS
 {
-	
+
+
 	public abstract class Singleton<T> : MonoBehaviour where T : Component
 	{
 
@@ -19,6 +20,7 @@ namespace UMGS
 
 	}
 
+
 	public abstract class SingletonInternal<T> : Singleton<T> where T : Component
 	{
 
@@ -29,7 +31,7 @@ namespace UMGS
 
 	}
 
-	public abstract class SingletonLocal<T> : Singleton<T> where T : Component 
+	public abstract class SingletonLocal<T> : Singleton<T> where T : Component
 	{
 
 		public static T Instance

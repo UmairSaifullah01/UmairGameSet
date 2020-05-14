@@ -1,18 +1,26 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 
 namespace UMGS
 {
+
+
 	public class TriggerTag : UJTrigger
 	{
 
 		public string     TargetTag;
 		public UnityEvent OnTriggerEnter;
 
-		void Start()
+		void OnEnable()
 		{
 			enter += Enter;
+		}
+
+		void OnDisable()
+		{
+			enter -= Enter;
 		}
 
 		void Enter(Collider col)

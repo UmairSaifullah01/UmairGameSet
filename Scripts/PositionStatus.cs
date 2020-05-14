@@ -7,17 +7,18 @@ using UnityEngine;
 public class PositionStatus : MonoBehaviour, IPositionStats
 {
 
-	private          WayPoint        currentWayPoint;
-	[SerializeField] WayPointManager Manager;
-	[SerializeField] int             fromIndex, endIndex;
-	WayPoint[]                       wayPoints;
-	float                            locationUpdateRate   = 0.1f;
-	int                              currentWayPointIndex = 0;
-	[SerializeField] TextMeshPro     text;
-	public           GameObject      Effect;
+	private WayPoint             currentWayPoint;
+	WayPointManager              Manager;
+	[SerializeField] int         fromIndex, endIndex;
+	WayPoint[]                   wayPoints;
+	float                        locationUpdateRate   = 0.1f;
+	int                          currentWayPointIndex = 0;
+	[SerializeField] TextMeshPro text;
+	public           GameObject  Effect;
 
 	void Start()
 	{
+		Manager         = FindObjectOfType<WayPointManager>();
 		currentWayPoint = Manager.head;
 		wayPoints       = Manager.CopyPoints(fromIndex, endIndex - fromIndex);
 		StartCoroutine(CheckWaypointDistance());

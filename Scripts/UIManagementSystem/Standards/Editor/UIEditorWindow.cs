@@ -36,7 +36,36 @@ public class UIEditorWindow : EditorWindow
 		CreateText();
 		CreateScript();
 		AddMeshCollider();
+		ChangeFont();
 		NameOrganizer();
+	}
+
+	TMP_FontAsset t;
+
+	TextMeshProUGUI[] texts;
+
+	void ChangeFont()
+	{
+		EditorGUILayout.BeginVertical("box");
+		EditorGUILayout.LabelField("Panel");
+		t = (TMP_FontAsset) EditorGUILayout.ObjectField("prefab", t, typeof(TMP_FontAsset), true);
+		if (GUILayout.Button("Find"))
+		{
+			texts = FindObjectsOfType<TextMeshProUGUI>();
+		}
+
+		if (texts != null && texts.Length > 0)
+		{
+			if (GUILayout.Button("Add"))
+			{
+				foreach (TextMeshProUGUI text in texts)
+				{
+					text.font = t;
+				}
+			}
+		}
+
+		EditorGUILayout.EndVertical();
 	}
 
 	string before, after;

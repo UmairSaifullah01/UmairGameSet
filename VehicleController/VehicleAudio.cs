@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UMGS.SoundSystem;
+using UnityEngine;
 
 
 namespace UMGS.Vehicle
@@ -13,40 +14,25 @@ namespace UMGS.Vehicle
 		[Range(0.0f, 3.0f)]         public float       minPitch     = 0.7f;
 		[Range(0.0f, 0.1f)]         public float       pitchSpeed   = 0.05f;
 		[Header("Clips")]           public AudioClip   rolling;
-		public                             AudioClip   starting, impact, skid;
-		[Header("Clips")] public           AudioSource engineSource;
-		public                             AudioSource othersSource;
+		public                             AudioClip   impact, skid;
+		[Header("Root")] public            Transform   audioContainer;
+		private                            AudioSource engineSource;
+		private                            AudioSource othersSource;
 		ControlInput                                   _input;
-		bool                                           startUp = false;
-		float                                          lastSkid;
+
 		AudioSource skidSource, impactSource;
 
 		public void Initialize(ControlInput input)
 		{
-			_input = input;
+			_input            = input;
+			engineSource      = rolling.Play(SoundType.SFX, audioContainer);
+			engineSource.loop = true;
+			othersSource      = SoundExtensions.CreateAudioSource("OtherSource", audioContainer, SoundType.SFX);
 		}
 
 		public void DoUpdate(float speed)
 		{
-			if (_input.run && !startUp)
-			{
-				engineSource.clip = starting;
-				engineSource.Play();
-				engineSource.pitch = 1;
-				startUp            = true;
-			}
-
-			if (startUp && !engineSource.isPlaying)
-			{
-				engineSource.clip = rolling;
-				engineSource.loop = true;
-				engineSource.Play();
-			}
-
-			if (engineSource.clip == rolling)
-			{
-				engineSource.pitch = Mathf.Clamp(Mathf.Lerp(engineSource.pitch, minPitch + Mathf.Abs(speed) / flatoutSpeed, pitchSpeed), minPitch, 2);
-			}
+			engineSource.pitch = Mathf.Clamp(Mathf.Lerp(engineSource.pitch, minPitch + 0.5f * _input.throttle + Mathf.Abs(speed) / flatoutSpeed, pitchSpeed), minPitch, 2);
 		}
 
 		public void ImpactAudio(Vector3 atPoint)
