@@ -127,7 +127,7 @@ namespace UMGS.Vehicle
 				}
 				else if (wheel.Drive && ControlInput.brake < 0.5f)
 				{
-					wheel.WheelCollider.motorTorque = ControlInput.throttle * motorTorque.Evaluate(speed) * diffGearing / 4; //Remember to count drive wheels
+					wheel.WheelCollider.motorTorque = EngineCalculations(); //Remember to count drive wheels
 				}
 
 				wheel.WheelCollider.brakeTorque = brakeForce * ControlInput.brake;
@@ -183,6 +183,11 @@ namespace UMGS.Vehicle
 				attachedRigidbody.AddTorque(driftTorque                         * driftIntensity, ForceMode.VelocityChange);
 				print("Drift");
 			}
+		}
+
+		float EngineCalculations()
+		{
+			return ControlInput.throttle * motorTorque.Evaluate(speed) * diffGearing / 4;
 		}
 
 		void DownForceImplementation()

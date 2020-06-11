@@ -16,13 +16,13 @@ namespace UMGS
 
 		#region Variables
 
-		public string[]                ignoreEvents;
-		public string[]                notEventProperties;
-		public string[]                ignore_vMono = new string[] {"openCloseWindow", "openCloseEvents", "selectedToolbar"};
+		public string[]              ignoreEvents;
+		public string[]              notEventProperties;
+		public string[]              ignore_vMono = new string[] {"openCloseWindow", "openCloseEvents", "selectedToolbar"};
 		public UClassHeaderAttribute headerAttribute;
-		public GUISkin                 skin;
-		public Texture2D               m_Logo;
-		public List<vToolBar>          toolbars;
+		public GUISkin               skin;
+		public Texture2D             m_Logo;
+		public List<vToolBar>        toolbars;
 
 		#endregion
 
@@ -100,7 +100,7 @@ namespace UMGS
 						toolbars.Remove(nullToolBar[i]);
 				}
 
-				ignoreEvents = events.DevToArray();
+				ignoreEvents = UMTools.ToArray(events);
 				if (headerAttribute != null)
 					m_Logo = Resources.Load(headerAttribute.iconName) as Texture2D;
 				//else headerAttribute = new vClassHeaderAttribute(target.GetType().Name);
@@ -252,7 +252,7 @@ namespace UMGS
 					props.Add(toolbars[i].title);
 			}
 
-			return props.DevToArray();
+			return UMTools.ToArray(props);
 		}
 
 		public string[] getIgnoreProperties(vToolBar toolbar)
@@ -273,7 +273,7 @@ namespace UMGS
 			}
 
 			props.Add("m_Script");
-			return props.DevToArray();
+			return UMTools.ToArray(props);
 		}
 
 	}

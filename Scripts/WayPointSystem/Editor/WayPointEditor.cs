@@ -34,6 +34,16 @@ public class WayPointEditor
 			Gizmos.color = Color.green;
 			Gizmos.DrawLine(wayPoint.GetPosition(1), wayPoint.nextWayPoint.GetPosition(1));
 		}
+
+		if (wayPoint.branches != null)
+		{
+			foreach (WayPoint branch in wayPoint.branches)
+			{
+				Gizmos.color = Color.blue;
+				Gizmos.DrawLine(wayPoint.GetPosition(),branch.GetPosition());
+			}
+			
+		}
 	}
 
 }

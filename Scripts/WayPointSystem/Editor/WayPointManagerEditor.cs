@@ -41,6 +41,11 @@ namespace UMGS.WayPointSystem
 				CreateWayPoint();
 			}
 
+			if (GUILayout.Button("Create Branch"))
+			{
+				CreateBranch();
+			}
+
 			if (GUILayout.Button("Create WayPoint Before"))
 				CreateWayPointBefore();
 			if (GUILayout.Button("Create WayPoint After"))
@@ -51,6 +56,18 @@ namespace UMGS.WayPointSystem
 				PlacetoGround();
 			if (GUILayout.Button("Rotate To Path"))
 				RotateToPath();
+		}
+
+		void CreateBranch()
+		{
+			GameObject wayPointObject = new GameObject($"WayPoint {wayPointRoot.childCount}", typeof(WayPoint));
+			wayPointObject.transform.SetParent(wayPointRoot, false);
+			var wayPoint   = wayPointObject.GetComponent<WayPoint>();
+			var branchFrom = Selection.activeGameObject.GetComponent<WayPoint>();
+			branchFrom.branches.Add(wayPoint);
+			wayPoint.transform.position = branchFrom.transform.position;
+			wayPoint.transform.forward  = branchFrom.transform.forward;
+			Selection.activeGameObject  = wayPoint.gameObject;
 		}
 
 		void RemoveWayPoint()
@@ -75,17 +92,25 @@ namespace UMGS.WayPointSystem
 			foreach (WayPoint trans in wayPointRoot.GetComponentsInChildren<WayPoint>())
 			{
 				//define ray to cast downwards waypoint position
-				Ray ray = new Ray(trans.transform.position + new Vector3(0, 2f, 0), -Vector3.up);
+				Ray ray1 = new Ray(trans.GetPosition(1) + new Vector3(0, 2f, 0), -Vector3.up);
+				Ray ray2 = new Ray(trans.GetPosition(0) + new Vector3(0, 2f, 0), -Vector3.up);
 				Undo.RecordObject(trans, "Place To Ground");
 				RaycastHit hit;
+				Vector3    v1 = trans.transform.position, v2 = trans.transform.position;
 				//cast ray against ground, if it hit:
-				if (Physics.Raycast(ray, out hit, 100))
+				if (Physics.Raycast(ray1, out hit, 100))
 				{
 					//position waypoint to hit point
-					trans.transform.position = hit.point;
+					v1 = hit.point;
 				}
 
-				
+				if (Physics.Raycast(ray2, out hit, 100))
+				{
+					v2 = hit.point;
+				}
+
+				trans.transform.position = v1 + (v2                                     - v1) / 2;
+				trans.transform.rotation = Quaternion.Euler(trans.transform.eulerAngles - Vector3.forward * Vector2.Angle(v2 - v1, trans.transform.position));
 			}
 		}
 

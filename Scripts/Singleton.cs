@@ -5,6 +5,15 @@ namespace UMGS
 {
 
 
+	public interface ISingleton<T> where T : Object
+	{
+
+		T Instance { get; }
+
+		void Create();
+
+	}
+
 	public abstract class Singleton<T> : MonoBehaviour where T : Component
 	{
 

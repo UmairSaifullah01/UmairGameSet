@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
-using Object = System.Object;
 
 
-namespace UM_Logger
+namespace UMGS.Log
 {
 
 
@@ -17,20 +17,62 @@ namespace UM_Logger
 		public static void Log<T>(this T type, string message)
 		{
 			if (!IsActivated) return;
-			message = "[" + DateTime.Now.ToString() + "]" + typeof(T).Name + " - " + message;
+			message = "[" + DateTime.Now.ToString(CultureInfo.InvariantCulture) + "]" + typeof(T).Name + " - " + message;
 			Debug.Log(message);
-			if (IsFileSave)
+			if (!IsFileSave) return;
+			using (StreamWriter writer = File.AppendText($"{Application.persistentDataPath}/EventLog.txt"))
 			{
-				using (var writer = File.AppendText($"{Application.persistentDataPath}/EventLog.txt"))
-				{
-					writer.WriteLine(message);
-				}
+				writer.WriteLine(message);
 			}
 		}
 
-		public static void Print(string message)
+		public static void Log(string message)
 		{
 			Debug.Log(message);
+		}
+
+	}
+
+	public class UMLogger : ILogHandler
+	{
+
+		public static bool         logEnabled => true;
+		private       FileStream   m_FileStream;
+		private       StreamWriter m_StreamWriter;
+		public        ILogHandler  logHandler = Debug.unityLogger.logHandler;
+		static        UMLogger     instance;
+
+		[RuntimeInitializeOnLoadMethod]
+		static void Initialize()
+		{
+			if (instance == null)
+			{
+				instance = new UMLogger();
+			}
+		}
+
+		UMLogger()
+		{
+			if (!logEnabled) return;
+			string filePath = Application.persistentDataPath + "/MyLogs.txt";
+			m_FileStream   = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+			m_StreamWriter = new StreamWriter(m_FileStream);
+
+			// Replace the default debug log handler
+			Debug.unityLogger.logHandler = this;
+			Debug.Log("Initialize");
+		}
+
+		public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
+		{
+			m_StreamWriter.WriteLine(String.Format(format, args));
+			m_StreamWriter.Flush();
+			logHandler.LogFormat(logType, context, format, args);
+		}
+
+		public void LogException(Exception exception, UnityEngine.Object context)
+		{
+			logHandler.LogException(exception, context);
 		}
 
 	}
