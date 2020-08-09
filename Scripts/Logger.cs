@@ -36,7 +36,7 @@ namespace UMGS.Log
 	public class UMLogger : ILogHandler
 	{
 
-		public static bool         logEnabled => true;
+		public static bool         logEnabled => false;
 		private       FileStream   m_FileStream;
 		private       StreamWriter m_StreamWriter;
 		public        ILogHandler  logHandler = Debug.unityLogger.logHandler;

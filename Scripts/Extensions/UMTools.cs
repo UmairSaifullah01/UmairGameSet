@@ -35,9 +35,9 @@ namespace UMGS
 			_obj.SetActive(true);
 		}
 
-		public static void SetActiveChildren(this GameObject gameObjet, bool value)
+		public static void SetActiveChildren(this GameObject gameObject, bool value)
 		{
-			foreach (Transform child in gameObjet.transform)
+			foreach (Transform child in gameObject.transform)
 				child.gameObject.SetActive(value);
 		}
 
@@ -202,10 +202,10 @@ namespace UMGS
 			Vector3 origin = from.position;
 			return Sensor(origin, radius, layerMask, tag);
 		}
-		
+
 		public static LocationTransform GetTransformValues(this Transform trans, bool isLocal = false)
 		{
-			return new LocationTransform {Position = (isLocal) ? trans.localPosition : trans.position, Rotation = (isLocal) ? trans.localRotation : trans.rotation};
+			return new LocationTransform {Position = isLocal ? trans.localPosition : trans.position, Rotation = isLocal ? trans.localRotation : trans.rotation};
 		}
 
 		public static void SetTransformValues(this Transform trans, LocationTransform values, bool isLocal = false)
@@ -333,7 +333,7 @@ namespace UMGS
 		{
 			var col         = rigidbody.GetComponent<Collider>();
 			var subCollider = rigidbody.GetComponentsInChildren<Collider>();
-			if (col && subCollider.Length > 0)
+			if (col)
 			{
 				subCollider.Append(col);
 			}

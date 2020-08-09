@@ -16,7 +16,7 @@ namespace UMGS.Vehicle
 
 		float GetInput(string input)
 		{
-			return SimpleInput.GetAxis(input);
+			return Input.GetAxis(input);
 		}
 
 		public override void DoUpdate(float speed)

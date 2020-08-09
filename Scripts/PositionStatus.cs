@@ -52,7 +52,7 @@ public class PositionStatus : MonoBehaviour, IPositionStats
 
 	void Update()
 	{
-		if (SimpleInput.GetButtonDown("Respawn"))
+		if (Input.GetButtonDown("Respawn"))
 		{
 			RespawnPosition();
 		}

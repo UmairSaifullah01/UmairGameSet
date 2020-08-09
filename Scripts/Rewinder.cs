@@ -23,9 +23,9 @@ public class Rewinder : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (SimpleInput.GetButtonDown("Jump"))
+		if (Input.GetButtonDown("Jump"))
 			StartRewind();
-		if (SimpleInput.GetButtonUp("Jump"))
+		if (Input.GetButtonUp("Jump"))
 			StopRewind();
 	}
 

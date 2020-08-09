@@ -12,16 +12,16 @@ namespace UMDataManagement
 
 		private static bool                       isInitialized;
 		private static Dictionary<string, object> data = new Dictionary<string, object>();
-		private static IDataSaver                 sdataSaver;
+		private static IDataSaver                 dataSaver;
 		static         string                     key = "gamedata";
 
 		/// <summary>
 		/// initialize data system
 		/// </summary>
-		public static void Initialize()
+		static void Initialize()
 		{
 			Logger.Log("Data Initialized with BinaryDataSaver");
-			sdataSaver    = new BinaryDataSaver();
+			dataSaver    = new BinaryDataSaver();
 			isInitialized = true;
 			Load();
 		}
@@ -32,7 +32,7 @@ namespace UMDataManagement
 		/// <param name="dataSaver"></param>
 		public static void Initialize(IDataSaver dataSaver)
 		{
-			sdataSaver    = dataSaver;
+			DataManager.dataSaver    = dataSaver;
 			isInitialized = true;
 		}
 
@@ -121,14 +121,14 @@ namespace UMDataManagement
 		{
 			var serializedData = new List<Entry>(data.Count);
 			serializedData.AddRange(data.Keys.Select(key => new Entry(key, data[key])));
-			sdataSaver.Save(key, serializedData);
+			dataSaver.Save(key, serializedData);
 		}
 
 		public static void Load()
 		{
-			if (!sdataSaver.Contains(key))
+			if (!dataSaver.Contains(key))
 				return;
-			var serializedData = sdataSaver.Get<List<Entry>>(key);
+			var serializedData = dataSaver.Get<List<Entry>>(key);
 			foreach (Entry entry in serializedData)
 			{
 				data[entry.Key] = entry.Value;

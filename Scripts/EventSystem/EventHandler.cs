@@ -9,12 +9,15 @@ namespace UMGS
 	{
 
 		//Game General Events
+		public static EventListener LevelComplete = new EventListener();
+		public static EventListener LevelFail     = new EventListener();
+		//Game states General Events
 		public static EventListener OnGamePaused  = new EventListener();
 		public static EventListener OnGameResume  = new EventListener();
 		public static EventListener OnGameRestart = new EventListener();
 		public static EventListener OnGameToHome  = new EventListener();
 		//Camera Events
-		public static EventListener<Camera> OnCameraChange = new EventListener<Camera>();
+		public static EventListener<int> OnCameraChange = new EventListener<int>();
 
 
 		//InApp Events
@@ -33,14 +36,8 @@ namespace UMGS
 		public static EventCallBack<int, bool> IsRewaredAvailable      = new EventCallBack<int, bool>();
 		public static EventListener            RewaredVideoRewardEvent = new EventListener();
 //Sounds
-		public static EventListener ButtonSound = new EventListener();
-
-
-		//Race Game Events
-
-		public static EventListener<string>       OnTimeUpdate = new EventListener<string>();
-		public static EventListener<int>          OnChangeCar  = new EventListener<int>();
-		public static EventListener<string, bool> ActiveEffect = new EventListener<string, bool>();
+		public static EventListener         ButtonSound = new EventListener();
+		public static EventListener<string> PlaySound   = new EventListener<string>();
 
 	}
 
