@@ -1,4 +1,7 @@
-﻿namespace UMGS
+﻿using System;
+
+
+namespace UMGS
 {
 
 
@@ -36,11 +39,14 @@
 
 		bool isTransiting { get; }
 
+		void LoadState(string id, Action<IState> onStateLoad);
+
 		IState GetState(string id);
 
 		void Entry(IState state);
-		
+
 		void Transition(ITransition transition);
+
 		void AnyTransition(IState state);
 
 		void ExitAnyStates();

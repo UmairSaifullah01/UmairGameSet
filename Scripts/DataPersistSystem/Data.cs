@@ -97,7 +97,7 @@ namespace UMDataManagement
     {
 
         public T key;
-        public T value;
+        public T1 value;
 
     }
 }

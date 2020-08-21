@@ -16,8 +16,9 @@ namespace UMUINew
 		public override void Init(IStateMachine stateMachine)
 		{
 			base.Init(stateMachine);
-			exitTime = 12;
+			exitTime = 3;
 			SetTransitions(new Transition(nameof(MenuPanel)));
+			
 		}
 
 		public override void Enter()

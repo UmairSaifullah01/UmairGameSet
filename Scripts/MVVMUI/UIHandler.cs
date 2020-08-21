@@ -11,14 +11,14 @@ namespace UMUINew
 {
 
 
-	// ReSharper disable once InconsistentNaming
 	public class UIHandler : MonoBehaviour, IStateMachine
 	{
 
-		readonly Dictionary<string, IState> cachedStates = new Dictionary<string, IState>();
-		IState                     currentState, previousState;
-		readonly Stack<IState>              anyStates = new Stack<IState>();
-		public bool                isTransiting { get; private set; }
+		[SerializeField] Transform                  container;
+		readonly         Dictionary<string, IState> cachedStates = new Dictionary<string, IState>();
+		IState                                      currentState, previousState;
+		readonly Stack<IState>                      anyStates = new Stack<IState>();
+		public   bool                               isTransiting { get; private set; }
 
 		void Awake()
 		{
@@ -29,7 +29,7 @@ namespace UMUINew
 				state.Init(this);
 			}
 
-			Entry(cachedStates["SplashPanel"]);
+			LoadState(nameof(SplashPanel), Entry);
 		}
 
 		void Update()
@@ -41,6 +41,24 @@ namespace UMUINew
 		public IState GetState(string id)
 		{
 			return cachedStates[id];
+		}
+
+		public void LoadState(string id, Action<IState> onStateLoad)
+		{
+			if (cachedStates.ContainsKey(id))
+			{
+				onStateLoad?.Invoke(cachedStates[id]);
+			}
+			else
+			{
+				AddressableManager.Get(id, container.transform, obj =>
+				{
+					IState state = obj.GetComponent<IState>();
+					cachedStates.Add(state.GetType().Name, state);
+					state.Init(this);
+					onStateLoad?.Invoke(state);
+				});
+			}
 		}
 
 		public void Entry(IState state)
@@ -83,10 +101,10 @@ namespace UMUINew
 
 		public void StatesExecution()
 		{
-			currentState.Execute();
+			currentState?.Execute();
 			foreach (var anyState in anyStates)
 			{
-				anyState.Execute();
+				anyState?.Execute();
 			}
 		}
 

@@ -37,6 +37,11 @@ namespace UMUINew
 
 		public void SetTransitions(params ITransition[] transitions)
 		{
+			foreach (var transition in transitions)
+			{
+				stateMachine.LoadState(transition.toState, null);
+			}
+
 			this.cachedTransitions = transitions.ToList();
 		}
 
