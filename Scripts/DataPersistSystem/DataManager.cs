@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Logger = UMGS.Log.Logger;
 
 
@@ -20,7 +21,7 @@ namespace UMDataManagement
 		/// </summary>
 		static void Initialize()
 		{
-			Logger.Log("Data Initialized with BinaryDataSaver");
+			Logger.Log($"Data Initialized with BinaryDataSaver {Application.persistentDataPath}");
 			dataSaver    = new BinaryDataSaver();
 			isInitialized = true;
 			Load();

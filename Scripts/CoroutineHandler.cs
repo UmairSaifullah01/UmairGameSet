@@ -27,12 +27,12 @@ namespace UMGS
 			updator = new UMUpdate(this);
 		}
 
-		static public Coroutine StartStaticCoroutine(IEnumerator coroutine)
+		public static Coroutine StartStaticCoroutine(IEnumerator coroutine)
 		{
 			return Instance.StartCoroutine(coroutine);
 		}
 
-		static public void StopStaticCoroutine(Coroutine coroutine)
+		public static void StopStaticCoroutine(Coroutine coroutine)
 		{
 			Instance.StopCoroutine(coroutine);
 		}
@@ -52,21 +52,24 @@ namespace UMGS
 
 		#region Update With Coroutine
 
-		private static UMUpdate updator;
+		static UMUpdate updator;
 
 		public static void DoUpdate(Action action, float delay = 0)
 		{
-			updator.DoUpdate(action, delay);
+			if (Instance)
+				updator.DoUpdate(action, delay);
 		}
 
 		public static void RemoveUpdate(Action action, float delay = 0)
 		{
-			updator.RemoveUpdate(action, delay);
+			if (Instance)
+				updator.RemoveUpdate(action, delay);
 		}
 
 		public static void StopUpdate(float delay = 0)
 		{
-			updator.StopUpdate(delay);
+			if (Instance)
+				updator.StopUpdate(delay);
 		}
 
 		#endregion
@@ -94,17 +97,17 @@ namespace UMGS
 
 		#region AfterWait for multipule functions
 
-		public static Coroutine AfterWait(bool realTime = false, params CoroutineSequence[] sequences)
+		public static Coroutine AfterWait(params CoroutineSequence[] sequences)
 		{
-			return Instance.StartCoroutine(AfterWaitCoroutine(realTime, sequences));
+			return Instance.StartCoroutine(AfterWaitCoroutine(sequences));
 		}
 
-		public static Coroutine AfterWait(MonoBehaviour Obj, bool realTime = false, params CoroutineSequence[] sequences)
+		public static Coroutine AfterWait(MonoBehaviour Obj, params CoroutineSequence[] sequences)
 		{
-			return Obj.StartCoroutine(AfterWaitCoroutine(realTime, sequences));
+			return Obj.StartCoroutine(AfterWaitCoroutine(sequences));
 		}
 
-		private static IEnumerator AfterWaitCoroutine(bool realTime, CoroutineSequence[] sequences)
+		private static IEnumerator AfterWaitCoroutine(CoroutineSequence[] sequences)
 		{
 			foreach (var item in sequences)
 			{
@@ -149,10 +152,11 @@ namespace UMGS
 
 		static IEnumerator WaitLoopCoroutine(Action action, Func<bool> condition, float seconds, bool realTime)
 		{
-			CoroutineDelay delay = new CoroutineDelay(action, seconds, realTime);
+			CoroutineDelay delay              = new CoroutineDelay(action, seconds, realTime);
+			var            waitForFixedUpdate = new WaitForFixedUpdate();
 			while (!condition())
 			{
-				yield return new WaitForFixedUpdate();
+				yield return waitForFixedUpdate;
 				if (seconds == 0)
 					action.Invoke();
 				else
@@ -177,14 +181,19 @@ namespace UMGS
 			return CoroutineHandler.AfterWait(Obj, action, seconds, realTime);
 		}
 
-		public static Coroutine AfterWait(this MonoBehaviour Obj, bool realTime = false, params CoroutineSequence[] sequences)
+		public static Coroutine AfterWait(this MonoBehaviour Obj, params CoroutineSequence[] sequences)
 		{
-			return CoroutineHandler.AfterWait(Obj, realTime, sequences);
+			return CoroutineHandler.AfterWait(Obj, sequences);
 		}
 
 		public static Coroutine AfterWait(this MonoBehaviour Obj, Action action, Func<bool> condition)
 		{
 			return CoroutineHandler.AfterWait(Obj, action, condition);
+		}
+
+		public static Coroutine WaitLoop(this MonoBehaviour Obj, Action action, Func<bool> condition, float seconds = 0, bool realTime = false)
+		{
+			return CoroutineHandler.WaitLoop(Obj, action, condition, seconds, realTime);
 		}
 
 	}
@@ -198,7 +207,9 @@ namespace UMGS
 	public abstract class CoroutineSequence
 	{
 
-		public Action action;
+		public    Action      action;
+		protected IEnumerator iterator;
+
 
 		public abstract IEnumerator Behaviour();
 
@@ -208,22 +219,26 @@ namespace UMGS
 	public class CoroutineDelay : CoroutineSequence
 	{
 
-		public float seconds;
-		public bool  realTime;
+		public    float            seconds;
+		protected bool             realTime = false;
+		protected YieldInstruction iterator2;
+
 
 		public CoroutineDelay(Action m_action, float m_seconds, bool m_realTime = false)
 		{
 			action   = m_action;
 			seconds  = m_seconds;
 			realTime = m_realTime;
+			if (realTime)
+				iterator   = new WaitForSecondsRealtime(seconds);
+			else iterator2 =  new WaitForSeconds(seconds);
 		}
 
 		public override IEnumerator Behaviour()
 		{
 			if (realTime)
-				yield return new WaitForSecondsRealtime(seconds);
-			else
-				yield return new WaitForSeconds(seconds);
+				yield return iterator;
+			else yield return iterator2;
 			action.Invoke();
 		}
 
@@ -233,17 +248,15 @@ namespace UMGS
 	public class CoroutineCondition : CoroutineSequence
 	{
 
-		public Func<bool> condition;
-
 		public CoroutineCondition(Action m_action, Func<bool> m_condition)
 		{
-			action    = m_action;
-			condition = m_condition;
+			action   = m_action;
+			iterator = new WaitUntil(m_condition);
 		}
 
 		public override IEnumerator Behaviour()
 		{
-			yield return new WaitUntil(condition);
+			yield return iterator;
 			action.Invoke();
 		}
 
@@ -253,30 +266,26 @@ namespace UMGS
 	public class UMUpdate
 	{
 
-		public Dictionary<float, UpdateData> updateCoroutines = new Dictionary<float, UpdateData>();
-		MonoBehaviour                        mono;
+		Dictionary<float, UpdateData> updateCoroutines = new Dictionary<float, UpdateData>();
+		MonoBehaviour                 mono;
 
 		public UMUpdate(MonoBehaviour mono)
 		{
 			this.mono = mono;
 		}
 
-		public void DoUpdate(CoroutineDelay action)
-		{
-			DoUpdate(action.action, action.seconds);
-		}
-
 		public void DoUpdate(Action action, float delay)
 		{
 			if (updateCoroutines.TryGetValue(delay, out UpdateData result))
 			{
-				result.action += action;
+				result.behavior.action += action;
 				if (result.coroutine == null)
-					result.coroutine = mono.StartCoroutine(DoUpdateCoroutine(result.action, delay));
+					result.coroutine = mono.StartCoroutine(DoUpdateCoroutine(result.behavior));
 			}
 			else
 			{
-				UpdateData data = new UpdateData() {action = action, coroutine = mono.StartCoroutine(DoUpdateCoroutine(action, delay))};
+				UpdateData data = new UpdateData {behavior = new CoroutineDelay(action, delay)};
+				data.coroutine = mono.StartCoroutine(DoUpdateCoroutine(data.behavior));
 				updateCoroutines.Add(delay, data);
 			}
 		}
@@ -285,8 +294,8 @@ namespace UMGS
 		{
 			if (updateCoroutines.TryGetValue(delayRegistor, out UpdateData result))
 			{
-				result.action -= action;
-				if (result.action == null)
+				result.behavior.action -= action;
+				if (result.behavior.action == null)
 				{
 					mono.StopCoroutine(result.coroutine);
 					updateCoroutines.Remove(delayRegistor);
@@ -303,27 +312,64 @@ namespace UMGS
 			}
 		}
 
-		IEnumerator DoUpdateCoroutine(Action action, float delay)
+		IEnumerator DoUpdateCoroutine(CoroutineDelay behavior)
 		{
+			WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
 			while (true)
 			{
-				yield return new WaitForFixedUpdate();
-				yield return new WaitForSeconds(delay);
-				action.Invoke();
+				yield return waitForFixedUpdate;
+				yield return behavior.Behaviour();
 			}
 		}
 
-		public struct UpdateData
+		struct UpdateData
 		{
 
-			public Action    action;
-			public Coroutine coroutine;
+			public CoroutineDelay behavior;
+			public Coroutine      coroutine;
 
 		}
 
 	}
 
 	#endregion
+
+
+	public class FlowBehaviour
+	{
+
+		private static   FlowBehaviour           instance;
+		private          MonoBehaviour           monobehaviour;
+		private readonly List<CoroutineSequence> sequences = new List<CoroutineSequence>();
+
+		public static FlowBehaviour Builder(MonoBehaviour behaviour)
+		{
+			instance = new FlowBehaviour {monobehaviour = behaviour};
+			return instance;
+		}
+
+		public Coroutine Start()
+		{
+			return CoroutineHandler.AfterWait(monobehaviour, sequences.ToArray());
+		}
+
+		public FlowBehaviour AfterWait(Action action, float seconds, bool realTime = false)
+		{
+			instance.sequences.Add(new CoroutineDelay(action, seconds, realTime));
+			return instance;
+		}
+
+		public FlowBehaviour AfterWait(Action action, Func<bool> condition)
+		{
+			instance.sequences.Add(new CoroutineCondition(action, condition));
+			return instance;
+		}
+		//public FlowBehaviour WaitLoop (Action action, Func<bool> condition, float seconds = 0, bool realTime = false)
+		//{
+
+		//}
+
+	}
 
 
 	#region Timer
@@ -337,16 +383,19 @@ namespace UMGS
 		private int       incr      = 0;
 		private int       speed     = 1;
 		private int       startFrom = 0;
-		Action            onComplete;
 
-		public TimeCounter(Action onComplete, Action update, float m_seconds, int m_startFrom = 0, bool m_realTime = false) : base(onComplete, m_seconds, m_realTime)
+		public TimeCounter(Action OnComplete, float m_seconds, int m_startFrom = 0) : base(OnComplete, m_seconds)
 		{
-			this.onComplete =  onComplete;
-			action          =  update;
-			seconds         =  m_seconds;
-			realTime        =  m_realTime;
-			startFrom       =  m_startFrom;
-			seconds         += m_startFrom;
+			startFrom =  m_startFrom;
+			seconds   += m_startFrom;
+			iterator2 =  new WaitForSeconds(1.0f / speed);
+		}
+
+		public TimeCounter(Action OnComplete, float m_seconds, int m_startFrom = 0, bool m_realTime = false) : base(OnComplete, m_seconds, m_realTime)
+		{
+			startFrom =  m_startFrom;
+			seconds   += m_startFrom;
+			iterator  =  new WaitForSecondsRealtime(1.0f / speed);
 		}
 
 		public void Start(bool isPlay = true)
@@ -411,14 +460,10 @@ namespace UMGS
 			for (incr = startFrom; incr < seconds; incr++)
 			{
 				yield return new WaitUntil(() => isPlaying);
-				if (realTime)
-					yield return new WaitForSecondsRealtime(1f / speed);
-				else
-					yield return new WaitForSeconds(1f / speed);
-				action?.Invoke();
+				yield return (object) iterator ?? iterator2;
 			}
 
-			onComplete?.Invoke();
+			action.Invoke();
 		}
 
 		public enum Format

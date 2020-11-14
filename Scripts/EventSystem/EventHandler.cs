@@ -12,10 +12,12 @@ namespace UMGS
 		public static EventListener LevelComplete = new EventListener();
 		public static EventListener LevelFail     = new EventListener();
 		//Game states General Events
-		public static EventListener OnGamePaused  = new EventListener();
-		public static EventListener OnGameResume  = new EventListener();
-		public static EventListener OnGameRestart = new EventListener();
-		public static EventListener OnGameToHome  = new EventListener();
+		public static EventListener      OnGameStart   = new EventListener();
+		public static EventListener      OnGamePaused  = new EventListener();
+		public static EventListener      OnGameResume  = new EventListener();
+		public static EventListener      OnGameRestart = new EventListener();
+		public static EventListener      OnGameToHome  = new EventListener();
+		public static EventListener<int> TutorialPanel = new EventListener<int>();
 		//Camera Events
 		public static EventListener<int> OnCameraChange = new EventListener<int>();
 
@@ -38,6 +40,11 @@ namespace UMGS
 //Sounds
 		public static EventListener         ButtonSound = new EventListener();
 		public static EventListener<string> PlaySound   = new EventListener<string>();
+
+
+		// Game logic 
+
+
 
 	}
 

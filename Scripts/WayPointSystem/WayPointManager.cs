@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace UMGS.WayPointSystem
@@ -25,8 +26,18 @@ namespace UMGS.WayPointSystem
 
 		void Awake()
 		{
-			head = transform.GetChild(0).GetComponent<WayPoint>();
+			if (transform.childCount == 0)
+			{
+				Destroy(GetComponent<WayPointManager>());
+				return;
+			}
+
 			Init();
+		}
+
+		public WayPoint GetRandomWayPoint()
+		{
+			return path[Random.Range(0, path.Count)];
 		}
 
 		public WayPoint[] CopyPoints(int start, int count)
@@ -71,8 +82,10 @@ namespace UMGS.WayPointSystem
 
 		private void Init()
 		{
+			head = transform.GetChild(0).GetComponent<WayPoint>();
 			WayPoint wayPoint = head;
-			while (wayPoint.nextWayPoint)
+			if (!wayPoint) return;
+			while (wayPoint.nextWayPoint != null && !path.Contains(wayPoint.nextWayPoint))
 			{
 				path.Add(wayPoint);
 				wayPoint.distanceFromPrevious =  wayPoint.previousWayPoint ? Vector3.Distance(wayPoint.GetPosition(), wayPoint.previousWayPoint.GetPosition()) : 0;
@@ -80,7 +93,7 @@ namespace UMGS.WayPointSystem
 				distance                      += wayPoint.distanceToNext;
 				wayPoint                      =  wayPoint.nextWayPoint;
 			}
-			
+
 			tail = wayPoint;
 		}
 

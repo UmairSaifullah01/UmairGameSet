@@ -42,7 +42,7 @@ namespace UMGS
 				trgr = gameObject.AddComponent<UJTrigger>();
 			}
 
-			trgr.hideFlags = HideFlags.HideInInspector;
+			//	trgr.hideFlags = HideFlags.HideInInspector;
 			return trgr;
 		}
 

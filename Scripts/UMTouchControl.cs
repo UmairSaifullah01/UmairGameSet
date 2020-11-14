@@ -4,10 +4,10 @@ using UnityEngine;
 public class UMTouchControl
 {
 
-	private Vector3 _fp;           //First touch position
-	private Vector3 _lp;           //Last touch position
-	private float   _dragDistance; //minimum distance for a swipe to be registered
-	public  Action  OnSwipeLeft, OnSwipeRight, OnSwipeUP, OnSwipeDown, OnTap;
+	private Vector3 _fp;                           //First touch position
+	private Vector3 _lp;                           //Last touch position
+	private float   _dragDistance, holdDelay = 1f; //minimum distance for a swipe to be registered
+	public  Action  OnSwipeLeft,   OnSwipeRight, OnSwipeUP, OnSwipeDown, OnTap,OnHold;
 
 	public static UMTouchControl Init(float dragDistance)
 	{
@@ -73,6 +73,8 @@ public class UMTouchControl
 					}
 					else
 					{
+						
+						
 						OnTap?.Invoke();
 						//It's a tap as the drag distance is less than 20% of the screen height
 						Debug.Log("Tap");

@@ -189,10 +189,15 @@ namespace UMGS.WayPointSystem
 					Selection.activeGameObject = wayPointObject;
 					if (wayPointRoot.childCount > 0)
 					{
-						wayPoint.previousWayPoint              = wayPointRoot.GetChild(wayPointRoot.childCount - 2).GetComponent<WayPoint>();
-						wayPoint.previousWayPoint.nextWayPoint = wayPoint;
-						wayPoint.transform.position            = hitInfo.point;
-						wayPoint.transform.forward             = wayPoint.previousWayPoint.transform.forward;
+						if (wayPointRoot.childCount > 1)
+						{
+							var privous = wayPointRoot.GetChild(wayPointRoot.childCount - 2).GetComponent<WayPoint>();
+							wayPoint.previousWayPoint              = privous;
+							wayPoint.previousWayPoint.nextWayPoint = wayPoint;
+							wayPoint.transform.forward             = wayPoint.previousWayPoint.transform.forward;
+						}
+
+						wayPoint.transform.position = hitInfo.point;
 					}
 				}
 			}

@@ -23,7 +23,7 @@ namespace UMUINew
 		public override void Init(IStateMachine stateMachine)
 		{
 			base.Init(stateMachine);
-			positiveGameObject = views.FirstOrDefault(x => x.Id == "PositiveButton")?.GetTransform().gameObject;
+			positiveGameObject = views["PositiveButton"]?.GetTransform().gameObject;
 		}
 
 		public override void Enter()

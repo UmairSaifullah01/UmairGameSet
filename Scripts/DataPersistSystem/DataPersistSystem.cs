@@ -17,7 +17,7 @@ namespace UMDataManagement
 
         private Dictionary<string, object> allData;
         private IDataSaver sdataSaver;
-        static string key = "UjsavedData";
+        static string key = "gamedata";
         static bool saved = false;
         protected override void Awake ()
         {

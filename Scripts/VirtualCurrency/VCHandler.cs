@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace UMGS
@@ -52,7 +53,7 @@ namespace UMGS
 				if (Enum.TryParse(v[i], out Currency currency))
 				{
 					builder.Append(" ");
-					virtualCurrencies[i] = new VirtualCurrency() {Name = currency, value = 0};
+					virtualCurrencies[i] = new VirtualCurrency(currency, 0);
 					builder.Append(currency);
 				}
 			}
@@ -147,8 +148,8 @@ namespace UMGS
 	public enum Currency
 	{
 
-		Coin = (1 << 0),
-		Cash = (1 << 1)
+		Coin = 1 << 0,
+		Cash = 1 << 1
 		// Add New Name here like Gems = 1 << 2 
 
 	}

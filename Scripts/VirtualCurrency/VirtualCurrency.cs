@@ -11,6 +11,15 @@ namespace UMGS
 	public class VirtualCurrency : INotifyPropertyChanged
 	{
 
+		public VirtualCurrency(Currency name, float initValue = 0)
+		{
+			Name = name;
+			if (!IsAvailable)
+			{
+				value = initValue;
+			}
+		}
+
 		public Currency Name;
 		public bool     IsAvailable => DataManager.Contains(Name.ToString());
 
@@ -33,8 +42,6 @@ namespace UMGS
 		}
 
 	}
-
-
 
 
 }

@@ -15,11 +15,11 @@ namespace UMUINew
 	public abstract class UIPanel : MonoBehaviour, IState, IViewModel
 	{
 
-		List<ITransition>                   cachedTransitions = new List<ITransition>();
+		Dictionary<string, ITransition>     cachedTransitions = new Dictionary<string, ITransition>();
 		public event Action<string, string> stringBinder;
 		public event Action<string, float>  floatBinder;
 		public event Action<string, Action> eventBinder;
-		public IView[]                      views          { get; set; }
+		public Dictionary<string, IView>    views          { get; set; }
 		public IStorageService              storageService { get; set; }
 
 
@@ -40,25 +40,34 @@ namespace UMUINew
 			foreach (var transition in transitions)
 			{
 				stateMachine.LoadState(transition.toState, null);
+				this.cachedTransitions.Add(transition.toState, transition);
 			}
-
-			this.cachedTransitions = transitions.ToList();
 		}
 
-		public ITransition[] GetTransitions() => cachedTransitions.ToArray();
+		public ITransition[] GetTransitions()
+		{
+			var transitions = new ITransition[cachedTransitions.Count];
+			int iterator    = 0;
+			foreach (var transition in cachedTransitions)
+			{
+				transitions[iterator] = transition.Value;
+				iterator++;
+			}
+
+			return transitions;
+		}
 
 		public void SetTransitionCondition(string stateName, bool value)
 		{
-			var trans                          = cachedTransitions.FirstOrDefault(x => x.toState == stateName);
-			if (trans != null) trans.condition = value;
+			this.cachedTransitions[stateName].condition = value;
 		}
 
 		public virtual void Execute()
 		{
-			var executableTransition = cachedTransitions.FirstOrDefault(x => x.condition);
-			if (executableTransition != null)
+			var executableTransition = cachedTransitions.FirstOrDefault(x => x.Value.condition);
+			if (!string.IsNullOrEmpty(executableTransition.Key))
 			{
-				stateMachine.Transition(executableTransition);
+				stateMachine.Transition(executableTransition.Value);
 			}
 		}
 
@@ -71,19 +80,27 @@ namespace UMUINew
 		public virtual void Exit()
 		{
 			gameObject.SetActive(false);
-			cachedTransitions.ForEach(x => x.condition = false);
+			foreach (var transition in cachedTransitions)
+			{
+				transition.Value.condition = false;
+			}
 		}
 
 		public virtual void InitViewModel()
 		{
 			if (views == null)
 			{
-				views = GetComponentsInChildren<IView>(true);
+				var v = GetComponentsInChildren<IView>(true);
+				views = new Dictionary<string, IView>();
+				foreach (IView view in v)
+				{
+					views.Add(view.Id, view);
+				}
 			}
 
-			foreach (IView view in views)
+			foreach (var view in views)
 			{
-				view.Init(this);
+				view.Value.Init(this);
 			}
 		}
 

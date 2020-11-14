@@ -21,21 +21,71 @@ MonoBehaviour:
   Sounds:
   - name: Click
     type: 1
-    audioClip: {fileID: 8300000, guid: 627bb68b1418e634798528f8609f0ffc, type: 3}
+    audioClip: {fileID: 8300000, guid: 361da367a2419be4f91da60cbe29937d, type: 3}
     audioClips: []
     loop: 0
     playRandomClip: 0
     playOnAwake: 0
-    volume: 0
-    pitch: 0
+    volume: 1
+    pitch: 1
     source: {fileID: 0}
-  - name: BackgroundMusic
+  - name: Notify
+    type: 0
+    audioClip: {fileID: 8300000, guid: ba50cac5d5f27394aa79a1a78e405954, type: 3}
+    audioClips: []
+    loop: 0
+    playRandomClip: 0
+    playOnAwake: 0
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: Background
+    type: 0
+    audioClip: {fileID: 8300000, guid: ba50cac5d5f27394aa79a1a78e405954, type: 3}
+    audioClips: []
+    loop: 0
+    playRandomClip: 0
+    playOnAwake: 0
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: Success
     type: 2
-    audioClip: {fileID: 8300000, guid: 627bb68b1418e634798528f8609f0ffc, type: 3}
+    audioClip: {fileID: 8300000, guid: 94da9d4cb1bb0fb4794186838e3395a1, type: 3}
+    audioClips: []
+    loop: 0
+    playRandomClip: 0
+    playOnAwake: 0
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: Fail
+    type: 2
+    audioClip: {fileID: 8300000, guid: 94da9d4cb1bb0fb4794186838e3395a1, type: 3}
+    audioClips: []
+    loop: 0
+    playRandomClip: 0
+    playOnAwake: 0
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: Ocean
+    type: 2
+    audioClip: {fileID: 8300000, guid: f9cec73a07eb0774daec9097c55385b7, type: 3}
     audioClips: []
     loop: 1
     playRandomClip: 0
+    playOnAwake: 1
+    volume: 0.1
+    pitch: 1
+    source: {fileID: 0}
+  - name: WaterSplash
+    type: 2
+    audioClip: {fileID: 8300000, guid: a9546dfde30a9cd43acc2febd4e89d99, type: 3}
+    audioClips: []
+    loop: 0
+    playRandomClip: 0
     playOnAwake: 0
-    volume: 0
-    pitch: 0
+    volume: 1
+    pitch: 1
     source: {fileID: 0}

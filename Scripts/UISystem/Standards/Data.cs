@@ -98,5 +98,12 @@ namespace UMUI
 
 	}
 
+	public class GamePlayData
+	{
 
+		float powerValue;
+
+	}
+	
+	
 }

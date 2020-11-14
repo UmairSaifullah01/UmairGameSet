@@ -20,6 +20,8 @@ namespace UMGS
 
 		Transform GetTransform();
 
+		void Active(bool value);
+
 	}
 
 
@@ -29,7 +31,7 @@ namespace UMGS
 		event Action<string, string> stringBinder;
 		event Action<string, float>  floatBinder;
 		event Action<string, Action> eventBinder;
-		IView[]                      views          { get; set; }
+		Dictionary<string, IView>    views          { get; set; }
 		IStorageService              storageService { get; set; }
 
 		void InitViewModel();

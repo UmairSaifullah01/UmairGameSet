@@ -26,10 +26,14 @@ namespace UMUINew
 			foreach (var state in states)
 			{
 				cachedStates.Add(state.GetType().Name, state);
-				state.Init(this);
 			}
 
-			LoadState(nameof(SplashPanel), Entry);
+			foreach (var state in cachedStates)
+			{
+				state.Value.Init(this);
+			}
+
+			LoadState(nameof(GamePlayPanel), Entry);
 		}
 
 		void Update()
@@ -49,6 +53,7 @@ namespace UMUINew
 			{
 				onStateLoad?.Invoke(cachedStates[id]);
 			}
+			#if AddressableAssets
 			else
 			{
 				AddressableManager.Get(id, container.transform, obj =>
@@ -59,6 +64,7 @@ namespace UMUINew
 					onStateLoad?.Invoke(state);
 				});
 			}
+			#endif
 		}
 
 		public void Entry(IState state)

@@ -6,7 +6,8 @@ using UnityEngine;
 
 namespace UMUINew
 {
-	
+
+
 	public class ViewBase : MonoBehaviour, IView
 	{
 
@@ -17,6 +18,8 @@ namespace UMUINew
 		{
 			this.viewModel = viewModel;
 		}
+
+		public virtual void Active(bool value) => gameObject.SetActive(value);
 
 		public Transform GetTransform() => transform;
 

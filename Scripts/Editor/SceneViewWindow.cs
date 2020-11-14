@@ -23,7 +23,7 @@ namespace UMGS.Utilities.Editor
 		/// <summary>
 		/// Initialize window state.
 		/// </summary>
-		[MenuItem("Window/OZI Quick Scene Navigator #s")]
+		[MenuItem("Window/Quick Scene Navigator #s")]
 		internal static void Init()
 		{
 			// EditorWindow.GetWindow() will return the open instance of the specified window or create a new

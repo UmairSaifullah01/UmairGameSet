@@ -1,4 +1,5 @@
 using UMGS;
+using UMGS.SoundSystem;
 
 
 namespace UMUINew
@@ -8,22 +9,26 @@ namespace UMUINew
 	public class CompletePanel : UIPanel
 	{
 
+		int currentOffer = 0;
+
 		public override void Init(IStateMachine stateMachine)
 		{
 			base.Init(stateMachine);
-			EventBinder("HomeButton",    HomeButton);
-			EventBinder("NextButton",    NextButton);
-			EventBinder("RestartButton", RestartButton);
+			EventBinder("HomeButton", HomeButton);
+			EventBinder("BTNNext",    RestartButton);
+		}
+
+		public override void Enter()
+		{
+			base.Enter();
+			// SoundManager.Instance.Play("Success");
 		}
 
 		void RestartButton()
 		{
-			EventHandler.OnGameRestart.Send();
+			SceneLoader.ReLoadScene();
 		}
 
-		void NextButton()
-		{
-		}
 
 		void HomeButton()
 		{

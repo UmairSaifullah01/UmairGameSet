@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -55,6 +54,8 @@ namespace UMGS
 
 		#region Transfrom
 
+		public static void SetActive(this Transform transform, bool value) => transform.gameObject.SetActive(value);
+
 		public static bool FindTagInParent(this Transform t, string tagString, out Transform other)
 		{
 			if (t.CompareTag(tagString))
@@ -96,10 +97,15 @@ namespace UMGS
 			trans.position = position;
 		}
 
-		public static void SetPosition(this Transform from, Transform target)
+		public static void SetTransform(this Transform from, Transform target)
 		{
 			from.position = target.position;
 			from.rotation = target.rotation;
+		}
+
+		public static void SetPosition(this Transform from, Transform target)
+		{
+			from.position = target.position;
 		}
 
 		public static void ResetTransformation(this Transform trans)
@@ -257,16 +263,16 @@ namespace UMGS
 			switch (aroundAxis)
 			{
 				case Axis.x:
-					return new Vector3(orign.x, orign.y + Random.Range(0.0f, radius), orign.z + Random.Range(0.0f, radius));
+					return new Vector3(orign.x, orign.y + Random.Range(-radius, radius), orign.z + Random.Range(-radius, radius));
 
 				case Axis.y:
-					return new Vector3(orign.x + Random.Range(0.0f, radius), orign.y, orign.z + Random.Range(0.0f, radius));
+					return new Vector3(orign.x + Random.Range(-radius, radius), orign.y, orign.z + Random.Range(-radius, radius));
 
 				case Axis.z:
-					return new Vector3(orign.x + Random.Range(0.0f, radius), orign.y + Random.Range(0.0f, radius), orign.z);
+					return new Vector3(orign.x + Random.Range(-radius, radius), orign.y + Random.Range(-radius, radius), orign.z);
 
 				default:
-					return new Vector3(orign.x + Random.Range(0.0f, radius), orign.y + Random.Range(0.0f, radius), orign.z);
+					return new Vector3(orign.x + Random.Range(-radius, radius), orign.y + Random.Range(-radius, radius), orign.z);
 			}
 		}
 
@@ -278,6 +284,11 @@ namespace UMGS
 		public static Vector3 Difference(this Vector3 vector, Vector3 otherVector)
 		{
 			return otherVector - vector;
+		}
+
+		public static Vector3 Direction(this Vector3 from, Vector3 to)
+		{
+			return from.Difference(to).normalized;
 		}
 
 		/// <summary>
@@ -324,6 +335,27 @@ namespace UMGS
 			return false;
 		}
 
+		public static Vector3 Right(this Vector3 from, Vector3 at)
+		{
+			return Vector3.Cross(from, at);
+		}
+
+		public static Vector3 Clamp(this Vector3 value, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax)
+		{
+			value.x = Mathf.Clamp(value.x, xMin, xMax);
+			value.y = Mathf.Clamp(value.y, yMin, yMax);
+			value.z = Mathf.Clamp(value.z, zMin, zMax);
+			return value;
+		}
+
+		public static Vector3 ClampAngle(this Vector3 value, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax)
+		{
+			value.x = ClampAngle(value.x, xMin, xMax);
+			value.y = ClampAngle(value.y, yMin, yMax);
+			value.z = ClampAngle(value.z, zMin, zMax);
+			return value;
+		}
+
 		#endregion
 
 
@@ -357,8 +389,7 @@ namespace UMGS
 				{
 					if (col.transform.parent.CompareTag(tag))
 						return true;
-					else
-						return false;
+					return false;
 				}
 			}
 
@@ -403,6 +434,23 @@ namespace UMGS
 			return bounds;
 		}
 
+		public static Vector3 CenterScreenToWorldPosition(this Camera camera)
+		{
+			return camera.ScreenToWorldPosition(new Vector3(Screen.width / 2, Screen.height / 2));
+		}
+
+		public static Vector3 ScreenToWorldPosition(this Camera camera, Vector3 position)
+		{
+			var ray = camera.ScreenPointToRay(position);
+			var pos = new Vector3(Screen.width / 2, Screen.height / 2);
+			if (Physics.Raycast(ray, out RaycastHit hit))
+			{
+				pos = hit.point;
+			}
+
+			return pos;
+		}
+
 		#endregion
 
 
@@ -444,7 +492,7 @@ namespace UMGS
 
 		#region Array
 
-		public static T[] Append<T>(this T[] arrayInitial, T[] arrayToAppend)
+		public static T[] Append<T>(this T[] arrayInitial, params T[] arrayToAppend)
 		{
 			if (arrayToAppend == null)
 			{
@@ -476,6 +524,11 @@ namespace UMGS
 			return list;
 		}
 
+		public static void Reverse<T>(this T[] list)
+		{
+			Array.Reverse(list);
+		}
+
 		#endregion
 
 
@@ -487,7 +540,24 @@ namespace UMGS
 			dict.Keys.CopyTo(array, 0);
 			return array;
 		}
-
+		public static T2[] ToArray<T, T2>(this Dictionary<T, T2> dict)
+		{
+			var array = new T2[dict.Count];
+			dict.Values.CopyTo(array, 0);
+			return array;
+		}
+		public static void CopyTo<T, T2>(this Dictionary<T, T2> dict, T2[] array, int arrayLength)
+		{
+			array = new T2[arrayLength];
+			int counter = 0;
+			foreach (var element in dict)
+			{
+				array[counter] = element.Value;
+				counter++;
+				if (counter >= arrayLength)
+					return;
+			}
+		}
 		#endregion
 
 
@@ -701,6 +771,16 @@ namespace UMGS
 				if (angle > 360)
 					angle -= 360;
 			} while (angle < -360 || angle > 360);
+
+			return Mathf.Clamp(angle, min, max);
+		}
+
+		public static float ClampAngle360(float angle, float min, float max)
+		{
+			if (angle < min && max > 360)
+			{
+				return Mathf.Clamp(angle, 0, ClampAngle360(max));
+			}
 
 			return Mathf.Clamp(angle, min, max);
 		}

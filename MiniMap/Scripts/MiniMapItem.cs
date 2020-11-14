@@ -26,7 +26,8 @@ public class MiniMapItem : MonoBehaviour, IMiniMapItem
 
 	void OnDestroy()
 	{
-		MiniMap.Unsubscribe(this);
+		if (enabled)
+			MiniMap.Unsubscribe(this);
 	}
 
 	void Start()
